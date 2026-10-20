@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Proteksi Anti-Screenshot CSS & Mobile Shield Khusus Safari / iPhone / Android */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
@@ -20,7 +19,6 @@
             animation: fadeIn 0.6s ease-out; position: relative;
         }
 
-        /* Watermark Shield Layer untuk Mencegah Screenshot Bersih di iOS/Android */
         #watermarkShield {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none; z-index: 99999; opacity: 0.03;
@@ -95,6 +93,18 @@
             padding: 25px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
 
+        /* MODAL PETUNJUK DALAM BAHASA DAERAH */
+        #notifModal { 
+            display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(6, 5, 15, 0.92); backdrop-filter: blur(12px); z-index: 9999; 
+            justify-content: center; align-items: center; padding: 20px; 
+        }
+        .notif-card { 
+            background: rgba(26, 22, 51, 0.98); border: 1px solid rgba(255, 0, 122, 0.5); 
+            border-radius: 20px; padding: 30px 24px; max-width: 440px; width: 100%; text-align: center; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+        }
+
         .screenshot-warning {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999999;
             display: none; justify-content: center; align-items: center; text-align: center; color: #ff007a; font-size: 18px; font-weight: 800; padding: 30px;
@@ -131,6 +141,19 @@
         </div>
     </div>
 
+    <!-- MODAL PETUNJUK BAHASA DAERAH -->
+    <div id="notifModal">
+        <div class="notif-card">
+            <h2 style="margin-bottom: 14px; font-size: 18px; background: linear-gradient(90deg, #ff007a, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Petunjuk Pembelajaran</h2>
+            <p style="color: #cbd5e1; font-size: 13.5px; line-height: 1.8; margin-bottom: 24px; text-align: left;">
+                1. Baca si si'da tenne catatan na ee, ampunna u'de di baca, u'de di insang itte jawabanna.<br>
+                2. 5 manne' ki membaca catatan<br>
+                3. 40 menit soal pilihan ganda
+            </p>
+            <button class="btn-action" onclick="mulaiSesiMembaca()"><i class="fas fa-book-open"></i> Mulai Membaca</button>
+        </div>
+    </div>
+
     <div class="header">
         <div>
             <h2>Pembelajaran Daring</h2>
@@ -139,8 +162,8 @@
     </div>
 
     <div class="container">
-        <!-- LANGSUNG MASUK MATERI TANPA MODAL PETUNJUK -->
-        <div id="materiSection" class="box">
+        <!-- TAHAP 1: MEMBACA CATATAN -->
+        <div id="materiSection" class="box" style="display: none;">
             <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; font-size: 15px;">1. Membaca Catatan Materi</h3>
             <div class="timer-box" id="timerDisplay">05:00</div>
             <div class="catatan-content" id="catatanText">Memuat catatan materi dari server...</div>
@@ -148,9 +171,11 @@
             <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal (Aktif setelah 3 menit)</button>
         </div>
 
+        <!-- TAHAP 2: MENJAWAB SOAL (TIMER 40 MENIT) -->
         <div id="soalSection" class="box" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
                 <h3 id="qNumber" style="font-size: 15px; color: #00f2fe;">Soal No. 1</h3>
+                <span id="soalTimerDisplay" style="color: #ff007a; font-weight: 800; font-size: 14px; background: rgba(255,0,122,0.1); padding: 4px 10px; border-radius: 8px;">40:00</span>
                 <span id="qCount" style="color: #94a3b8; font-size: 12px; font-weight: 700;">1 / 20</span>
             </div>
 
@@ -167,6 +192,7 @@
             </button>
         </div>
 
+        <!-- TAHAP 3: HASIL -->
         <div id="hasilSection" class="box" style="display: none; text-align: center; padding: 35px 20px;">
             <h2 style="margin-bottom: 8px; color: #00f2fe;">Pembelajaran Selesai</h2>
             <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 25px;">Tugas Anda berhasil dikirim ke server.</p>
@@ -189,17 +215,15 @@
         let examData = [];
         let userAnswers = {};
         let currentIdx = 0;
-        let timerSeconds = 300; 
+        let timerSeconds = 300; // 5 Menit Baca
+        let soalTimerSeconds = 40 * 60; // 40 Menit Pengerjaan Soal
         let isFinished = false;
 
-        // Auto Mulai Sesi Membaca & Fullscreen otomatis saat halaman dibuka
         window.addEventListener('DOMContentLoaded', () => {
-            mintaFullscreen();
-            updateStatusPengerjaan("sedang mengerjakan");
-            loadCatatan();
+            // Begitu login, pastikan status "sudah login" terkirim seketika
+            updateStatusPengerjaan("sudah login");
         });
 
-        // Proteksi Tambahan untuk iOS Safari / Mobile Screenshot & Key shortcuts
         document.addEventListener('keyup', (e) => { if (e.key === 'PrintScreen') triggerSSProtection(); });
         document.addEventListener('keydown', (e) => {
             if ((e.ctrlKey && (e.key === 'p' || e.key === 's')) || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'S')) || e.key === 'F12') {
@@ -213,6 +237,16 @@
             const shield = document.getElementById('ssShield');
             shield.style.display = 'flex';
             setTimeout(() => { shield.style.display = 'none'; }, 3000);
+        }
+
+        function mulaiSesiMembaca() {
+            document.getElementById('notifModal').style.display = 'none';
+            document.getElementById('materiSection').style.display = 'block';
+            mintaFullscreen();
+            
+            // Ubah status ke "sedang mengerjakan" saat masuk catatan
+            updateStatusPengerjaan("sedang mengerjakan");
+            loadCatatan();
         }
 
         function updateStatusPengerjaan(statusText) {
@@ -288,6 +322,8 @@
             document.getElementById('materiSection').style.display = 'none';
             document.getElementById('soalSection').style.display = 'block';
 
+            startSoalTimer(); // Mulai timer 40 menit
+
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -302,6 +338,26 @@
                     alert('Soal belum tersedia di spreadsheet.');
                 }
             });
+        }
+
+        function startSoalTimer() {
+            const display = document.getElementById('soalTimerDisplay');
+            const interval = setInterval(() => {
+                if (isFinished) {
+                    clearInterval(interval);
+                    return;
+                }
+                let m = Math.floor(soalTimerSeconds / 60);
+                let s = soalTimerSeconds % 60;
+                display.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+
+                if (soalTimerSeconds <= 0) {
+                    clearInterval(interval);
+                    alert("Waktu pengerjaan 40 menit telah habis! Tugas akan dikumpulkan otomatis.");
+                    executeSubmitTugas();
+                }
+                soalTimerSeconds--;
+            }, 1000);
         }
 
         function renderQuestion(index) {
@@ -331,7 +387,7 @@
         function selectOpt(soalId, val) {
             userAnswers[soalId] = val;
             renderQuestion(currentIdx);
-            sendProgress(); // Live update nilai ke backend & admin setiap klik/ubah opsi
+            sendProgress(); // Live update nilai & jawaban secara seketika tanpa refresh
         }
 
         function sendProgress() {
