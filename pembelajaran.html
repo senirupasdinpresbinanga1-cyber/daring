@@ -107,6 +107,56 @@
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999999;
             display: none; justify-content: center; align-items: center; text-align: center; color: #ff007a; font-size: 18px; font-weight: 800; padding: 30px;
         }
+
+        /* TABEL NILAI MINGGU LALU */
+        .nilai-container {
+            margin-top: 25px;
+            text-align: left;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 20px;
+        }
+        .nilai-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #00f2fe;
+            margin-bottom: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .kelas-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff007a;
+            margin: 15px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 0, 122, 0.3);
+        }
+        .table-nilai {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .table-nilai th, .table-nilai td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .table-nilai th {
+            color: #94a3b8;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .table-nilai tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .table-nilai td.score {
+            font-weight: 700;
+            color: #00f2fe;
+            text-align: right;
+            width: 60px;
+        }
     </style>
 </head>
 <body>
@@ -190,11 +240,40 @@
             </button>
         </div>
 
-        <!-- TAHAP 3: HASIL -->
+        <!-- TAHAP 3: HASIL & NILAI MINGGU LALU -->
         <div id="hasilSection" class="box" style="display: none; text-align: center; padding: 35px 20px;">
             <h2 style="margin-bottom: 8px; color: #00f2fe;">Pembelajaran Selesai</h2>
-            <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 25px;">Tugas Kamu berhasil dikirim.</p>
+            <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 15px;">Tugas Kamu berhasil dikirim.</p>
             <div style="font-size: 45px; font-weight: 800; border: 2px solid #00f2fe; padding: 20px; width: 180px; margin: 0 auto 25px auto; border-radius: 20px; color: #00f2fe; box-shadow: 0 0 25px rgba(0,242,254,0.3);" id="scoreDisplay">0</div>
+            
+            <!-- DAFTAR NILAI MINGGU LALU -->
+            <div class="nilai-container">
+                <div class="nilai-title"><i class="fas fa-poll-h"></i> Nilai Menggambar Digital Minggu Lalu</div>
+                
+                <div class="kelas-header"><i class="fas fa-users"></i> KELAS 6A</div>
+                <table class="table-nilai">
+                    <thead>
+                        <tr>
+                            <th>Nama Siswa</th>
+                            <th style="text-align: right;">Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listNilai6A"></tbody>
+                </table>
+
+                <div class="kelas-header"><i class="fas fa-users"></i> KELAS 6B</div>
+                <table class="table-nilai">
+                    <thead>
+                        <tr>
+                            <th>Nama Siswa</th>
+                            <th style="text-align: right;">Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listNilai6B"></tbody>
+                </table>
+            </div>
+
+            <br>
             <button class="btn-action" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Keluar Akun</button>
         </div>
     </div>
@@ -214,6 +293,82 @@
         let userAnswers = {};
         let currentIdx = 0;
         let isFinished = false;
+
+        // Data Nilai Minggu Lalu
+        const dataNilaiMingguLalu = {
+            "6A": [
+                {"nama": "ABID AQILAH WAHYUDI", "nilai": 41},
+                {"nama": "AINUN HAKIMAH", "nilai": 22},
+                {"nama": "AINUN NUR AZIZAH A", "nilai": 37},
+                {"nama": "AMELIA AHMAD", "nilai": 43},
+                {"nama": "ANDI FAISYA SYAHIRA", "nilai": 29},
+                {"nama": "ANDI MUHAMMAD FAQIH AIRY H", "nilai": 33},
+                {"nama": "CAHYA AINUN", "nilai": 25},
+                {"nama": "DZAKY", "nilai": 33},
+                {"nama": "FARDHAN ZAKI JASMAR", "nilai": 16},
+                {"nama": "FEBY KHAIRUNNISA", "nilai": 33},
+                {"nama": "KHAIRA NAJWA BAZIMA", "nilai": 39},
+                {"nama": "LISNA YANTI", "nilai": 27},
+                {"nama": "MUH REVAN APRILIAN", "nilai": 39},
+                {"nama": "MUH RIFKI AL FAHREZA Z", "nilai": 39},
+                {"nama": "MUH. ARIFKI", "nilai": 28},
+                {"nama": "MUH. MIFTAHUL YAFI ASIS", "nilai": 41},
+                {"nama": "MUH. RAFLI", "nilai": 17},
+                {"nama": "MUHAMMAD ARAS QURUSYA", "nilai": 20},
+                {"nama": "MUHAMMAD SYAWAL", "nilai": 19},
+                {"nama": "NAYLA SALSABILLAH", "nilai": 13},
+                {"nama": "NURUL ADIVA AMRAN", "nilai": 40},
+                {"nama": "ST ASSYURAH JUHARBI", "nilai": 0},
+                {"nama": "SYAFWAAN SABQI", "nilai": 0},
+                {"nama": "YUSUF GIBRAN Y", "nilai": 21},
+                {"nama": "ZAM ZAMMY KHAIRIL MALIKI ABHAL", "nilai": 41}
+            ],
+            "6B": [
+                {"nama": "AIRIN RAHMI ANDINI", "nilai": 27},
+                {"nama": "ANINDYA JINAN RISQI", "nilai": 35},
+                {"nama": "ANNISA RAMADANI", "nilai": 49},
+                {"nama": "ANNISA SALSABILA", "nilai": 43},
+                {"nama": "ASYKAR ALFATIH", "nilai": 34},
+                {"nama": "CAHAYA AURA NAZHIFA", "nilai": 0},
+                {"nama": "DEWA AYU RESTTI GAURI", "nilai": 47},
+                {"nama": "DIAN AFIKA", "nilai": 18},
+                {"nama": "FACHRU RAFAY", "nilai": 38},
+                {"nama": "FITRAH RAMADHAN ABDILLA", "nilai": 31},
+                {"nama": "JANUAR MUSA P", "nilai": 46},
+                {"nama": "KHARMAWAN", "nilai": 41},
+                {"nama": "M HILAL FIQRI AUTHAR R", "nilai": 16},
+                {"nama": "MIRZA SIDDIQIYAH RUSADY", "nilai": 36},
+                {"nama": "MUH FARIS GHAIZAN", "nilai": 21},
+                {"nama": "MUH MUHAIMIN FAIZAL. M", "nilai": 39},
+                {"nama": "MUH NAUFAL HAFIDZ", "nilai": 15},
+                {"nama": "MUH. AL HAFIDZ NASWAR", "nilai": 22},
+                {"nama": "MUH. AL QADRI", "nilai": 18},
+                {"nama": "MUH. MIRZA UKAIL", "nilai": 15},
+                {"nama": "MUHAMMAD ALGHAZHALY", "nilai": 0},
+                {"nama": "MUHAMMAD NUR", "nilai": 23},
+                {"nama": "SITI ALMIRAH", "nilai": 30},
+                {"nama": "UTARI MAHYA SANJAYA", "nilai": 31},
+                {"nama": "DZAKIYYA AZALIYYA", "nilai": 39},
+                {"nama": "AZIDAN DHIYAULHAQ", "nilai": 15}
+            ]
+        };
+
+        function renderNilaiMingguLalu() {
+            const tbody6A = document.getElementById('listNilai6A');
+            const tbody6B = document.getElementById('listNilai6B');
+            
+            let html6A = '';
+            dataNilaiMingguLalu["6A"].forEach(item => {
+                html6A += `<tr><td>${item.nama}</td><td class="score">${item.nilai}</td></tr>`;
+            });
+            tbody6A.innerHTML = html6A;
+
+            let html6B = '';
+            dataNilaiMingguLalu["6B"].forEach(item => {
+                html6B += `<tr><td>${item.nama}</td><td class="score">${item.nilai}</td></tr>`;
+            });
+            tbody6B.innerHTML = html6B;
+        }
 
         // Kunci localStorage khusus untuk masing-masing siswa agar timer tersimpan per akun
         const STORAGE_KEY_STAGE = 'stage_' + nisnSiswa;
@@ -490,6 +645,9 @@
                     document.getElementById('soalSection').style.display = 'none';
                     document.getElementById('hasilSection').style.display = 'block';
                     document.getElementById('scoreDisplay').innerText = data.nilai;
+
+                    // Tampilkan Tabel Nilai Minggu Lalu
+                    renderNilaiMingguLalu();
                 }
             });
         }
@@ -503,8 +661,6 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'logout', nisn: nisnSiswa })
             }).finally(() => {
-                // Catatan: localStorage timer TIDAK dihapus saat logout biasa (agar jika login kembali, timer tetap lanjut).
-                // Hanya status login & data sesi yang dibersihkan.
                 localStorage.removeItem('isLoggedIn');
                 localStorage.removeItem('nisnSiswa');
                 localStorage.removeItem('namaSiswa');
