@@ -98,7 +98,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
-            // Interval Auto Refresh Dipercepat 2 detik untuk Live Update super cepat
             setInterval(loadData, 2000);
         });
 
@@ -195,7 +194,7 @@
         }
 
         function resetSiswa(nisn) {
-            if (!confirm('Reset pengerjaan siswa dengan NISN ' + nisn + '?')) return;
+            if (!confirm('Reset pengerjaan siswa dengan NISN ' + nisn + '? Siswa dapat login kembali setelah di-reset.')) return;
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
