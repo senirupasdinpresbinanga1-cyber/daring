@@ -33,14 +33,12 @@
         .btn-nav { background: #222; color: #fff; border: 1px solid #444; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; }
         .btn-nav:hover { border-color: #fff; }
 
-        /* WARNING OVERLAY FULLSCREEN */
         #warningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         .warning-card { background: #111; border: 2px solid #fff; border-radius: 8px; padding: 30px; max-width: 450px; width: 100%; }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY PERINGATAN KELUAR FULLSCREEN -->
     <div id="warningOverlay">
         <div class="warning-card">
             <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 15px;"></i>
@@ -58,7 +56,6 @@
     </div>
 
     <div class="container">
-        <!-- TAHAP 1: MEMBACA CATATAN -->
         <div id="materiSection" class="box">
             <h3 style="margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">1. Membaca Catatan Materi</h3>
             <div class="timer-box" id="timerDisplay">05:00</div>
@@ -67,7 +64,6 @@
             <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal</button>
         </div>
 
-        <!-- TAHAP 2: MENJAWAB SOAL (20 PILIHAN GANDA) -->
         <div id="soalSection" class="box" style="display: none;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">
                 <h3 id="qNumber">Soal No. 1</h3>
@@ -85,7 +81,6 @@
             <button class="btn-action" id="btnSubmit" onclick="submitJawaban()" style="display: none; background: #222; color: #fff; border: 1px solid #fff;">Kumpulkan Tugas</button>
         </div>
 
-        <!-- TAHAP 3: HASIL -->
         <div id="hasilSection" class="box" style="display: none; text-align: center;">
             <h2 style="margin-bottom: 10px;">Pembelajaran Selesai</h2>
             <p style="color: #aaa; margin-bottom: 20px;">Tugas Anda berhasil dikirim ke server.</p>
@@ -116,7 +111,6 @@
             mintaFullscreen();
         });
 
-        // FULLSCREEN PROTEKSI LAYAR
         function mintaFullscreen() {
             var el = document.documentElement;
             if (el.requestFullscreen) { el.requestFullscreen().catch(()=>{}); }
