@@ -3,86 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Pembelajaran Daring</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Admin - Pembelajaran Daring Seni Rupa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #000; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        .header { background: #111; border-bottom: 1px solid #333; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        body { 
+            background: linear-gradient(135deg, #0a0814 0%, #0f172a 100%); 
+            color: #f8fafc; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            animation: fadeIn 0.5s ease-out;
+        }
 
-        .container { padding: 30px; flex: 1; }
-        .box { background: #111; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #333; padding: 10px 14px; text-align: left; font-size: 13px; }
-        th { background: #1a1a1a; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        tr:hover { background: #181818; }
-
-        .btn { background: #fff; color: #000; border: none; padding: 8px 16px; font-weight: 700; font-size: 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn:hover { background: #ccc; }
-        .btn-outline { background: transparent; color: #fff; border: 1px solid #fff; }
-        .btn-outline.active { background: #fff; color: #000; }
-        .btn-danger { background: #000; color: #fff; border: 1px solid #fff; padding: 6px 12px; font-size: 11px; }
-
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #111; border: 1px solid #333; padding: 15px; text-align: center; border-radius: 6px; }
-        .stat-card h3 { font-size: 28px; margin-top: 5px; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         
-        .class-filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .header { 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 18px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 { 
+            font-size: 18px; 
+            font-weight: 800; 
+            background: linear-gradient(90deg, #ff007a, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container { padding: 30px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .box { 
+            background: rgba(30, 41, 59, 0.6); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 16px; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { 
+            background: rgba(15, 23, 42, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 14px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #ff007a, #00f2fe);
+        }
+        .stat-card p { font-size: 11px; color: #94a3b8; font-weight: 700; letter-spacing: 1px; }
+        .stat-card h3 { font-size: 32px; margin-top: 8px; font-weight: 800; color: #00f2fe; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; overflow: hidden; border-radius: 10px; }
+        th, td { padding: 12px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        th { background: rgba(15, 23, 42, 0.9); color: #cbd5e1; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; font-weight: 700; }
+        tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .btn { 
+            background: linear-gradient(135deg, #00f2fe, #4facfe); 
+            color: #0f172a; 
+            border: none; 
+            padding: 9px 18px; 
+            font-weight: 700; 
+            font-size: 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: 0.3s; 
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3); }
+        
+        .btn-outline { 
+            background: transparent; 
+            color: #f8fafc; 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+        }
+        .btn-outline:hover { background: rgba(255, 255, 255, 0.1); border-color: #00f2fe; }
+        .btn-outline.active { 
+            background: linear-gradient(135deg, #ff007a, #7928ca); 
+            color: #fff; 
+            border-color: transparent; 
+            box-shadow: 0 4px 15px rgba(255, 0, 122, 0.4);
+        }
+
+        .btn-danger { 
+            background: linear-gradient(135deg, #ff416c, #ff4b2b); 
+            color: #fff; 
+            border: none; 
+            padding: 6px 14px; 
+            font-size: 11px; 
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-danger:hover { box-shadow: 0 4px 12px rgba(255, 65, 108, 0.4); }
+
+        .badge-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .status-login { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
+        .status-mengerjakan { background: rgba(255, 184, 0, 0.15); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
+        .status-selesai { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
+        .status-belum { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+
+        .class-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>Panel Admin Pembelajaran Daring</h1>
-        <button class="btn btn-outline" onclick="logout()">Keluar</button>
+        <h1><i class="fas fa-user-shield"></i> Panel Admin Seni Rupa</h1>
+        <button class="btn btn-outline" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
     </div>
 
     <div class="container">
         <div class="stat-grid">
             <div class="stat-card">
-                <p style="font-size: 11px; color: #aaa;">TOTAL SISWA</p>
+                <p>TOTAL SISWA</p>
                 <h3 id="totSiswa">0</h3>
             </div>
             <div class="stat-card">
-                <p style="font-size: 11px; color: #aaa;">SUDAH SELESAI</p>
+                <p>SUDAH SELESAI</p>
                 <h3 id="totSelesai">0</h3>
-            </div>
-            <div class="stat-card">
-                <p style="font-size: 11px; color: #aaa;">RATA-RATA NILAI</p>
-                <h3 id="avgNilai">0</h3>
             </div>
         </div>
 
         <div class="box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                <h3>Rekapitulasi Nilai Siswa</h3>
-                <button class="btn btn-outline" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="font-weight: 800; letter-spacing: 0.5px;">Rekapitulasi Nilai & Status Siswa</h3>
+                <button class="btn btn-outline" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
             </div>
 
             <!-- TOMBOL PILIHAN KELAS 6A & 6B -->
             <div class="class-filter-bar">
-                <button class="btn btn-outline active" id="btnKelas6A" onclick="filterKelas('6A')">Kelas 6A</button>
-                <button class="btn btn-outline" id="btnKelas6B" onclick="filterKelas('6B')">Kelas 6B</button>
+                <button class="btn btn-outline active" id="btnKelas6A" onclick="filterKelas('6A')"><i class="fas fa-users"></i> Kelas 6A</button>
+                <button class="btn btn-outline" id="btnKelas6B" onclick="filterKelas('6B')"><i class="fas fa-users"></i> Kelas 6B</button>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Absen</th>
-                        <th>Nama Siswa</th>
-                        <th>Kelas</th>
-                        <th>Status Pengerjaan</th>
-                        <th>Nilai</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="logTableBody"></tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Absen</th>
+                            <th>Nama Siswa</th>
+                            <th>Kelas</th>
+                            <th>Status Pengerjaan</th>
+                            <th>Nilai</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -112,18 +214,13 @@
                     document.getElementById('totSiswa').innerText = globalSiswa.length;
 
                     let selesaiCount = 0;
-                    let totNilai = 0;
-
                     globalLog.forEach(l => {
-                        if (l.status && l.status.includes('Selesai')) {
+                        if (l.status && l.status.toLowerCase().includes('selesai')) {
                             selesaiCount++;
-                            totNilai += parseFloat(l.nilai_akhir || 0);
                         }
                     });
 
                     document.getElementById('totSelesai').innerText = selesaiCount;
-                    document.getElementById('avgNilai').innerText = selesaiCount > 0 ? (totNilai / selesaiCount).toFixed(2) : 0;
-
                     renderTable();
                 }
             });
@@ -137,7 +234,6 @@
         }
 
         function renderTable() {
-            // Filter ketat berdasarkan teks kelas di sheet Siswa (mengandung '6a' atau '6b')
             const filteredSiswa = globalSiswa.filter(s => {
                 const k = (s.kelas || "").toLowerCase().trim();
                 if (selectedKelas === '6A') return k.includes('6a') || k.includes('kelas a');
@@ -153,19 +249,29 @@
             let html = '';
             filteredSiswa.forEach((s, idx) => {
                 const logItem = logMap[s.nisn.toString().trim()];
-                let statusBadge = '<span style="color:#888;">Belum Mulai</span>';
+                let statusBadge = '<span class="badge-status status-belum">Belum Mulai</span>';
                 let nilaiVal = '-';
                 let actionBtn = '-';
 
                 if (logItem) {
-                    statusBadge = logItem.status;
-                    nilaiVal = `<b>${logItem.nilai_akhir || 0}</b>`;
-                    actionBtn = `<button class="btn btn-danger" onclick="resetSiswa('${s.nisn}')">Reset</button>`;
+                    let st = (logItem.status || "").toLowerCase();
+                    if (st === "sudah login") {
+                        statusBadge = `<span class="badge-status status-login">sudah login</span>`;
+                    } else if (st.includes("sedang mengerjakan") || st.includes("mengerjakan")) {
+                        statusBadge = `<span class="badge-status status-mengerjakan">${logItem.status}</span>`;
+                    } else if (st.includes("selesai")) {
+                        statusBadge = `<span class="badge-status status-selesai">${logItem.status}</span>`;
+                    } else {
+                        statusBadge = `<span class="badge-status status-belum">${logItem.status}</span>`;
+                    }
+
+                    nilaiVal = `<b style="color:#00f2fe; font-size:15px;">${logItem.nilai_akhir || 0}</b>`;
+                    actionBtn = `<button class="btn btn-danger" onclick="resetSiswa('${s.nisn}')"><i class="fas fa-undo"></i> Reset</button>`;
                 }
 
                 html += `<tr>
                     <td>${idx + 1}</td>
-                    <td>${s.nisn}</td>
+                    <td><b>${s.nisn}</b></td>
                     <td>${s.nama}</td>
                     <td>${s.kelas}</td>
                     <td>${statusBadge}</td>
@@ -174,11 +280,11 @@
                 </tr>`;
             });
 
-            document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">Tidak ada data siswa pada kelas ini.</td></tr>';
+            document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Tidak ada data siswa pada kelas ini.</td></tr>';
         }
 
         function resetSiswa(nisn) {
-            if (!confirm('Reset pengerjaan siswa dengan NISN ' + nisn + '?')) return;
+            if (!confirm('Reset pengerjaan siswa dengan NISN ' + nisn + '? Login device juga akan di-reset.')) return;
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
