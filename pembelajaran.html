@@ -180,7 +180,7 @@
     <div id="customConfirmModal">
         <div class="confirm-card">
             <i class="fas fa-question-circle" style="font-size: 40px; color: #00f2fe; margin-bottom: 12px;"></i>
-            <h3 style="font-size: 16px; margin-bottom: 8px; color: #fff;">Konfirmasi Pengumpulan</h3>
+            <h3 style="font-size: 16px; margin-bottom: 8px; color: #fff;">Konfirmasi Pengumpulkan</h3>
             <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">Yakin ingin mengumpulkan seluruh jawaban tugas Kamu?</p>
             <div style="display: flex; gap: 10px;">
                 <button class="btn-nav" onclick="closeConfirmModal()" style="background: rgba(255,255,255,0.08);">Batal</button>
@@ -370,10 +370,11 @@
             tbody6B.innerHTML = html6B;
         }
 
-        // Kunci localStorage khusus untuk masing-masing siswa agar timer tersimpan per akun
+        // Kunci localStorage khusus per siswa
         const STORAGE_KEY_STAGE = 'stage_' + nisnSiswa;
         const STORAGE_KEY_TIMER_BACA = 'timer_baca_' + nisnSiswa;
         const STORAGE_KEY_TIMER_SOAL = 'timer_soal_' + nisnSiswa;
+        const STORAGE_KEY_FINAL_SCORE = 'final_score_' + nisnSiswa;
 
         let timerSeconds = 300;       // Default 5 Menit Baca
         let soalTimerSeconds = 40 * 60; // Default 40 Menit Soal
@@ -381,21 +382,28 @@
         window.addEventListener('DOMContentLoaded', () => {
             updateStatusPengerjaan("sudah login");
 
-            // Cek status tahap terakhir siswa dari localStorage saat halaman dimuat/refresh/login kembali
+            // Cek status pengerjaan terakhir
             const savedStage = localStorage.getItem(STORAGE_KEY_STAGE);
             
-            if (savedStage === 'soal') {
-                // Jika sebelumnya sudah masuk tahap soal, langsung lewati modal & tahap baca
+            if (savedStage === 'selesai') {
+                isFinished = true;
+                document.getElementById('notifModal').style.display = 'none';
+                document.getElementById('materiSection').style.display = 'none';
+                document.getElementById('soalSection').style.display = 'none';
+                
+                const savedScore = localStorage.getItem(STORAGE_KEY_FINAL_SCORE) || '0';
+                document.getElementById('scoreDisplay').innerText = savedScore;
+                document.getElementById('hasilSection').style.display = 'block';
+                renderNilaiMingguLalu();
+            } else if (savedStage === 'soal') {
                 document.getElementById('notifModal').style.display = 'none';
                 
-                // Ambil sisa waktu soal yang tersimpan
                 let savedSoalTime = localStorage.getItem(STORAGE_KEY_TIMER_SOAL);
                 if (savedSoalTime !== null && !isNaN(savedSoalTime)) {
                     soalTimerSeconds = parseInt(savedSoalTime);
                 }
-                mulaiMengerjakanSoal(true); // Langsung ke sesi soal
+                mulaiMengerjakanSoal(true);
             } else if (savedStage === 'baca') {
-                // Jika sebelumnya sedang membaca
                 document.getElementById('notifModal').style.display = 'none';
                 document.getElementById('materiSection').style.display = 'block';
                 
@@ -403,7 +411,7 @@
                 if (savedBacaTime !== null && !isNaN(savedBacaTime)) {
                     timerSeconds = parseInt(savedBacaTime);
                 }
-                loadCatatan(false); // Lanjutkan timer baca tanpa reset
+                loadCatatan(false);
             }
         });
 
@@ -483,7 +491,6 @@
             const display = document.getElementById('timerDisplay');
             const btn = document.getElementById('btnLanjutSoal');
 
-            // Cek kondisi tombol langsung jika sisa waktu sudah <= 180 detik saat direfresh
             if (timerSeconds <= 180) {
                 btn.disabled = false;
                 btn.innerText = "Lanjut Menjawab Soal";
@@ -494,7 +501,6 @@
                 let s = timerSeconds % 60;
                 display.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
 
-                // Simpan sisa waktu membaca ke localStorage tiap detik agar aman saat refresh
                 localStorage.setItem(STORAGE_KEY_TIMER_BACA, timerSeconds);
 
                 if (timerSeconds <= 180) {
@@ -550,7 +556,6 @@
                 let s = soalTimerSeconds % 60;
                 display.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
 
-                // Simpan sisa waktu pengerjaan soal ke localStorage tiap detik
                 localStorage.setItem(STORAGE_KEY_TIMER_SOAL, soalTimerSeconds);
 
                 if (soalTimerSeconds <= 0) {
@@ -637,17 +642,28 @@
             .then(data => {
                 if (data.status === 'success') {
                     isFinished = true;
-                    // Hapus data timer localStorage setelah tugas sukses dikumpulkan
-                    localStorage.removeItem(STORAGE_KEY_STAGE);
+                    
+                    // Simpan status pengerjaan Selesai dan Nilai di localStorage
+                    localStorage.setItem(STORAGE_KEY_STAGE, 'selesai');
+                    localStorage.setItem(STORAGE_KEY_FINAL_SCORE, data.nilai);
+
+                    // Hapus data timer pengerjaan
                     localStorage.removeItem(STORAGE_KEY_TIMER_BACA);
                     localStorage.removeItem(STORAGE_KEY_TIMER_SOAL);
 
+                    // Sembunyikan bagian materi & soal sepenuhnya
+                    document.getElementById('materiSection').style.display = 'none';
                     document.getElementById('soalSection').style.display = 'none';
+                    
+                    // Tampilkan bagian hasil
                     document.getElementById('hasilSection').style.display = 'block';
                     document.getElementById('scoreDisplay').innerText = data.nilai;
 
                     // Tampilkan Tabel Nilai Minggu Lalu
                     renderNilaiMingguLalu();
+
+                    if (document.exitFullscreen) { document.exitFullscreen().catch(()=>{}); }
+                    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
                 }
             });
         }
