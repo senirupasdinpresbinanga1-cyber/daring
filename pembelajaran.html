@@ -7,104 +7,57 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Proteksi Anti-Screenshot CSS & Mobile Shield */
+        /* Proteksi Anti-Screenshot CSS & Mobile Shield Khusus Safari / iPhone / Android */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+            -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
             -webkit-touch-callout: none;
         }
 
         body { 
             background: linear-gradient(135deg, #0a0814 0%, #121026 50%, #080f1d 100%); 
-            color: #f8fafc; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden;
-            animation: fadeIn 0.6s ease-out;
+            color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden;
+            animation: fadeIn 0.6s ease-out; position: relative;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.99); }
-            to { opacity: 1; transform: scale(1); }
+        /* Watermark Shield Layer untuk Mencegah Screenshot Bersih di iOS/Android */
+        #watermarkShield {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 99999; opacity: 0.03;
+            background: repeating-linear-gradient(45deg, #fff, #fff 10px, transparent 10px, transparent 20px);
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
 
         .header { 
-            background: rgba(18, 16, 38, 0.85); 
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-            padding: 14px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: sticky; top: 0; z-index: 10;
+            background: rgba(18, 16, 38, 0.85); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 14px 20px; 
+            display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;
         }
-        .header h2 { 
-            font-size: 15px; 
-            font-weight: 800; 
-            background: linear-gradient(90deg, #ff007a, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .header h2 { font-size: 15px; font-weight: 800; background: linear-gradient(90deg, #ff007a, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .header p { font-size: 11px; color: #94a3b8; font-weight: 600; }
 
         .container { flex: 1; max-width: 800px; width: 100%; margin: 0 auto; padding: 18px; display: flex; flex-direction: column; }
         
         .box { 
-            background: rgba(26, 22, 51, 0.75); 
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 16px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            animation: fadeIn 0.4s ease-out;
+            background: rgba(26, 22, 51, 0.75); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); animation: fadeIn 0.4s ease-out;
         }
 
         .timer-box { 
-            font-size: 26px; 
-            font-weight: 800; 
-            text-align: center; 
-            background: rgba(0, 242, 254, 0.08);
-            border: 1px solid rgba(0, 242, 254, 0.3); 
-            color: #00f2fe;
-            border-radius: 12px;
-            padding: 12px; 
-            margin-bottom: 18px; 
-            letter-spacing: 2px; 
-            box-shadow: inset 0 0 15px rgba(0, 242, 254, 0.15);
+            font-size: 26px; font-weight: 800; text-align: center; background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.3); color: #00f2fe; border-radius: 12px; padding: 12px; 
+            margin-bottom: 18px; letter-spacing: 2px; box-shadow: inset 0 0 15px rgba(0, 242, 254, 0.15);
         }
 
-        .catatan-content { 
-            font-size: 14px; 
-            line-height: 1.8; 
-            color: #cbd5e1; 
-            white-space: pre-line; 
-            max-height: 380px; 
-            overflow-y: auto; 
-            padding-right: 8px; 
-        }
+        .catatan-content { font-size: 14px; line-height: 1.8; color: #cbd5e1; white-space: pre-line; max-height: 380px; overflow-y: auto; padding-right: 8px; }
 
         .btn-action { 
-            background: linear-gradient(135deg, #ff007a 0%, #7928ca 100%); 
-            color: #fff; 
-            border: none; 
-            padding: 14px 20px; 
-            font-weight: 800; 
-            font-size: 13px; 
-            text-transform: uppercase; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            width: 100%; 
-            box-shadow: 0 6px 20px rgba(255, 0, 122, 0.35);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            background: linear-gradient(135deg, #ff007a 0%, #7928ca 100%); color: #fff; border: none; padding: 14px 20px; 
+            font-weight: 800; font-size: 13px; text-transform: uppercase; border-radius: 12px; cursor: pointer; 
+            transition: all 0.3s ease; width: 100%; box-shadow: 0 6px 20px rgba(255, 0, 122, 0.35);
+            display: flex; justify-content: center; align-items: center; gap: 10px;
         }
         .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 122, 0.5); }
         .btn-action:disabled { background: rgba(255, 255, 255, 0.08); color: #64748b; cursor: not-allowed; box-shadow: none; border: 1px solid rgba(255, 255, 255, 0.05); }
@@ -112,137 +65,53 @@
         .q-text { font-size: 15px; font-weight: 700; margin-bottom: 18px; line-height: 1.6; color: #f1f5f9; }
         .options-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
         .option-item { 
-            background: rgba(15, 15, 35, 0.6); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            padding: 14px 16px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-size: 13px; 
-            transition: all 0.2s ease; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
+            background: rgba(15, 15, 35, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); padding: 14px 16px; 
+            border-radius: 12px; cursor: pointer; font-size: 13px; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px; 
         }
         .option-item:hover { border-color: #00f2fe; background: rgba(0, 242, 254, 0.08); }
-        .option-item.selected { 
-            border-color: #ff007a; 
-            background: rgba(255, 0, 122, 0.15); 
-            box-shadow: 0 0 15px rgba(255, 0, 122, 0.25);
-            font-weight: 700;
-        }
+        .option-item.selected { border-color: #ff007a; background: rgba(255, 0, 122, 0.15); box-shadow: 0 0 15px rgba(255, 0, 122, 0.25); font-weight: 700; }
 
         .nav-btns { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
         .btn-nav { 
-            background: rgba(255, 255, 255, 0.05); 
-            color: #f8fafc; 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            padding: 12px 18px; 
-            font-weight: 700; 
-            font-size: 12px;
-            border-radius: 10px; 
-            cursor: pointer; 
-            flex: 1;
-            transition: 0.2s;
+            background: rgba(255, 255, 255, 0.05); color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.15); 
+            padding: 12px 18px; font-weight: 700; font-size: 12px; border-radius: 10px; cursor: pointer; flex: 1; transition: 0.2s;
         }
         .btn-nav:hover { border-color: #00f2fe; background: rgba(0, 242, 254, 0.1); }
 
-        /* NOTIFIKASI TOAST MELAYANG DI TENGAH */
         #centerToast { 
-            display: none; 
-            position: fixed; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(18, 16, 38, 0.95); 
-            backdrop-filter: blur(20px);
-            border: 1px solid #ff007a; 
-            border-radius: 16px; 
-            padding: 20px 25px; 
-            z-index: 99999; 
-            text-align: center; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(255,0,122,0.3);
-            max-width: 320px;
-            width: 90%;
-            animation: fadeIn 0.3s ease-out;
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: rgba(18, 16, 38, 0.95); backdrop-filter: blur(20px); border: 1px solid #ff007a; 
+            border-radius: 16px; padding: 20px 25px; z-index: 99999; text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(255,0,122,0.3); max-width: 320px; width: 90%;
         }
 
-        /* MODAL KONFIRMASI CUSTOM (Agar Fullscreen Tidak Lepas) */
         #customConfirmModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(6, 5, 15, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 999999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(6, 5, 15, 0.85); backdrop-filter: blur(8px); z-index: 999999;
+            justify-content: center; align-items: center; padding: 20px;
         }
         .confirm-card {
-            background: rgba(26, 22, 51, 0.95);
-            border: 1px solid rgba(0, 242, 254, 0.4);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 380px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
-        }
-
-        /* MODAL PETUNJUK AWAL */
-        #notifModal { 
-            display: flex; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100vw; height: 100vh; 
-            background: rgba(6, 5, 15, 0.9); 
-            backdrop-filter: blur(10px);
-            z-index: 9999; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 20px; 
-        }
-        .notif-card { 
-            background: rgba(26, 22, 51, 0.95); 
-            border: 1px solid rgba(255, 0, 122, 0.4); 
-            border-radius: 20px; 
-            padding: 28px 22px; 
-            max-width: 420px; 
-            width: 100%; 
-            text-align: center; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            background: rgba(26, 22, 51, 0.95); border: 1px solid rgba(0, 242, 254, 0.4); border-radius: 20px;
+            padding: 25px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
 
         .screenshot-warning {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000;
-            z-index: 9999999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #ff007a;
-            font-size: 18px;
-            font-weight: 800;
-            padding: 30px;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 9999999;
+            display: none; justify-content: center; align-items: center; text-align: center; color: #ff007a; font-size: 18px; font-weight: 800; padding: 30px;
         }
-
-        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY DETEKSI SCREENSHOT -->
+    <div id="watermarkShield"></div>
+
     <div id="ssShield" class="screenshot-warning">
         <div>
             <i class="fas fa-user-slash" style="font-size: 50px; margin-bottom: 15px;"></i><br>
-            TINDAKAN DILARANG!<br><span style="font-size: 13px; color: #aaa; font-weight: 400; margin-top: 10px; display: block;">Screenshot & perekaman layar dinonaktifkan selama pembelajaran.</span>
+            TINDAKAN DILARANG!<br><span style="font-size: 13px; color: #aaa; font-weight: 400; margin-top: 10px; display: block;">Screenshot & perekaman layar dinonaktifkan.</span>
         </div>
     </div>
 
-    <!-- TOAST NOTIFIKASI LAYAR PENUH -->
     <div id="centerToast">
         <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ff007a; margin-bottom: 10px;"></i>
         <h4 style="font-size: 15px; margin-bottom: 6px;">Peringatan Layar</h4>
@@ -250,7 +119,6 @@
         <button class="btn-action" style="padding: 10px;" onclick="kembaliFullscreen()">Kembali Layar Penuh</button>
     </div>
 
-    <!-- MODAL KONFIRMASI CUSTOM KUMPUL TUGAS (Mencegah Keluar Fullscreen) -->
     <div id="customConfirmModal">
         <div class="confirm-card">
             <i class="fas fa-question-circle" style="font-size: 40px; color: #00f2fe; margin-bottom: 12px;"></i>
@@ -263,20 +131,6 @@
         </div>
     </div>
 
-    <!-- MODAL PETUNJUK AWAL -->
-    <div id="notifModal">
-        <div class="notif-card">
-            <h2 style="margin-bottom: 12px; font-size: 18px; background: linear-gradient(90deg, #ff007a, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Petunjuk Pembelajaran</h2>
-            <p style="color: #cbd5e1; font-size: 13px; line-height: 1.7; margin-bottom: 22px; text-align: left;">
-                1. Anda diberikan waktu membaca materi selama <b>5 menit</b>.<br>
-                2. Tombol menjawab soal akan aktif setelah <b>3 menit</b>.<br>
-                3. Terdapat <b>20 soal pilihan ganda</b>.<br>
-                4. Fitur Screenshot & Tangkapan Layar dinonaktifkan secara otomatis.
-            </p>
-            <button class="btn-action" onclick="mulaiSesiMembaca()"><i class="fas fa-book-open"></i> Saya Mengerti, Mulai Membaca</button>
-        </div>
-    </div>
-
     <div class="header">
         <div>
             <h2>Pembelajaran Daring</h2>
@@ -285,8 +139,8 @@
     </div>
 
     <div class="container">
-        <!-- TAHAP 1: MEMBACA CATATAN -->
-        <div id="materiSection" class="box" style="display: none;">
+        <!-- LANGSUNG MASUK MATERI TANPA MODAL PETUNJUK -->
+        <div id="materiSection" class="box">
             <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; font-size: 15px;">1. Membaca Catatan Materi</h3>
             <div class="timer-box" id="timerDisplay">05:00</div>
             <div class="catatan-content" id="catatanText">Memuat catatan materi dari server...</div>
@@ -294,7 +148,6 @@
             <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal (Aktif setelah 3 menit)</button>
         </div>
 
-        <!-- TAHAP 2: MENJAWAB SOAL -->
         <div id="soalSection" class="box" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
                 <h3 id="qNumber" style="font-size: 15px; color: #00f2fe;">Soal No. 1</h3>
@@ -314,7 +167,6 @@
             </button>
         </div>
 
-        <!-- TAHAP 3: HASIL -->
         <div id="hasilSection" class="box" style="display: none; text-align: center; padding: 35px 20px;">
             <h2 style="margin-bottom: 8px; color: #00f2fe;">Pembelajaran Selesai</h2>
             <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 25px;">Tugas Anda berhasil dikirim ke server.</p>
@@ -337,19 +189,20 @@
         let examData = [];
         let userAnswers = {};
         let currentIdx = 0;
-        let timerSeconds = 300; // 5 Menit total
+        let timerSeconds = 300; 
         let isFinished = false;
 
-        // PROTEKSI SCREENSHOT & KEYBOARD SHORTCUT
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'PrintScreen') {
-                triggerSSProtection();
-            }
+        // Auto Mulai Sesi Membaca & Fullscreen otomatis saat halaman dibuka
+        window.addEventListener('DOMContentLoaded', () => {
+            mintaFullscreen();
+            updateStatusPengerjaan("sedang mengerjakan");
+            loadCatatan();
         });
+
+        // Proteksi Tambahan untuk iOS Safari / Mobile Screenshot & Key shortcuts
+        document.addEventListener('keyup', (e) => { if (e.key === 'PrintScreen') triggerSSProtection(); });
         document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey && (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')) || 
-                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'S' || e.key === 's')) || 
-                e.key === 'F12') {
+            if ((e.ctrlKey && (e.key === 'p' || e.key === 's')) || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'S')) || e.key === 'F12') {
                 e.preventDefault();
                 triggerSSProtection();
             }
@@ -362,25 +215,11 @@
             setTimeout(() => { shield.style.display = 'none'; }, 3000);
         }
 
-        function mulaiSesiMembaca() {
-            document.getElementById('notifModal').style.display = 'none';
-            document.getElementById('materiSection').style.display = 'block';
-            mintaFullscreen();
-            updateStatusPengerjaan("sedang mengerjakan");
-            loadCatatan();
-        }
-
         function updateStatusPengerjaan(statusText) {
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'updateStatus',
-                    nisn: nisnSiswa,
-                    nama: namaSiswa,
-                    kelas: kelasSiswa,
-                    statusText: statusText
-                })
+                body: JSON.stringify({ action: 'updateStatus', nisn: nisnSiswa, nama: namaSiswa, kelas: kelasSiswa, statusText: statusText })
             });
         }
 
@@ -420,9 +259,6 @@
                 } else {
                     document.getElementById('catatanText').innerText = "Gagal memuat catatan materi.";
                 }
-            })
-            .catch(() => {
-                document.getElementById('catatanText').innerText = "Gagal terhubung ke server database.";
             });
         }
 
@@ -495,7 +331,7 @@
         function selectOpt(soalId, val) {
             userAnswers[soalId] = val;
             renderQuestion(currentIdx);
-            sendProgress();
+            sendProgress(); // Live update nilai ke backend & admin setiap klik/ubah opsi
         }
 
         function sendProgress() {
@@ -517,7 +353,6 @@
         function nextSoal() { if (currentIdx < examData.length - 1) renderQuestion(currentIdx + 1); }
         function prevSoal() { if (currentIdx > 0) renderQuestion(currentIdx - 1); }
 
-        // Fungsi Membuka Modal Konfirmasi Custom (Menggantikan confirm() bawaan browser)
         function konfirmasiSubmit() {
             document.getElementById('customConfirmModal').style.display = 'flex';
         }
