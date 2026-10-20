@@ -146,7 +146,7 @@
         }
         .btn-nav:hover { border-color: #00f2fe; background: rgba(0, 242, 254, 0.1); }
 
-        /* NOTIFIKASI TOAST MELAYANG DI TENGAH (Poin 1) */
+        /* NOTIFIKASI TOAST MELAYANG DI TENGAH */
         #centerToast { 
             display: none; 
             position: fixed; 
@@ -163,6 +163,30 @@
             max-width: 320px;
             width: 90%;
             animation: fadeIn 0.3s ease-out;
+        }
+
+        /* MODAL KONFIRMASI CUSTOM (Agar Fullscreen Tidak Lepas) */
+        #customConfirmModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(6, 5, 15, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 999999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .confirm-card {
+            background: rgba(26, 22, 51, 0.95);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
 
         /* MODAL PETUNJUK AWAL */
@@ -193,7 +217,7 @@
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000;
-            z-index: 999999;
+            z-index: 9999999;
             display: none;
             justify-content: center;
             align-items: center;
@@ -212,11 +236,13 @@
 
     <!-- OVERLAY DETEKSI SCREENSHOT -->
     <div id="ssShield" class="screenshot-warning">
-        <i class="fas fa-user-slash" style="font-size: 50px; margin-bottom: 15px;"></i><br>
-        TINDAKAN DILARANG!<br><span style="font-size: 13px; color: #aaa; font-weight: 400; margin-top: 10px; display: block;">Screenshot & perekaman layar dinonaktifkan selama pembelajaran.</span>
+        <div>
+            <i class="fas fa-user-slash" style="font-size: 50px; margin-bottom: 15px;"></i><br>
+            TINDAKAN DILARANG!<br><span style="font-size: 13px; color: #aaa; font-weight: 400; margin-top: 10px; display: block;">Screenshot & perekaman layar dinonaktifkan selama pembelajaran.</span>
+        </div>
     </div>
 
-    <!-- TOAST NOTIFIKASI LAYAR PENUH (Melayang Di Tengah) -->
+    <!-- TOAST NOTIFIKASI LAYAR PENUH -->
     <div id="centerToast">
         <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ff007a; margin-bottom: 10px;"></i>
         <h4 style="font-size: 15px; margin-bottom: 6px;">Peringatan Layar</h4>
@@ -224,7 +250,20 @@
         <button class="btn-action" style="padding: 10px;" onclick="kembaliFullscreen()">Kembali Layar Penuh</button>
     </div>
 
-    <!-- MODAL NOTIFIKASI PETUNJUK AWAL -->
+    <!-- MODAL KONFIRMASI CUSTOM KUMPUL TUGAS (Mencegah Keluar Fullscreen) -->
+    <div id="customConfirmModal">
+        <div class="confirm-card">
+            <i class="fas fa-question-circle" style="font-size: 40px; color: #00f2fe; margin-bottom: 12px;"></i>
+            <h3 style="font-size: 16px; margin-bottom: 8px; color: #fff;">Konfirmasi Pengumpulan</h3>
+            <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">Yakin ingin mengumpulkan seluruh jawaban tugas Anda?</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-nav" onclick="closeConfirmModal()" style="background: rgba(255,255,255,0.08);">Batal</button>
+                <button class="btn-action" style="flex: 1; padding: 10px;" onclick="executeSubmitTugas()">Ya, Kumpulkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PETUNJUK AWAL -->
     <div id="notifModal">
         <div class="notif-card">
             <h2 style="margin-bottom: 12px; font-size: 18px; background: linear-gradient(90deg, #ff007a, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Petunjuk Pembelajaran</h2>
@@ -270,7 +309,7 @@
                 <button class="btn-nav" id="btnNext" onclick="nextSoal()">Lanjut <i class="fas fa-arrow-right"></i></button>
             </div>
             <br>
-            <button class="btn-action" id="btnSubmit" onclick="submitJawaban()" style="display: none; background: linear-gradient(135deg, #00e676, #00b0ff);">
+            <button class="btn-action" id="btnSubmit" onclick="konfirmasiSubmit()" style="display: none; background: linear-gradient(135deg, #00e676, #00b0ff);">
                 <i class="fas fa-paper-plane"></i> Kumpulkan Tugas
             </button>
         </div>
@@ -301,7 +340,7 @@
         let timerSeconds = 300; // 5 Menit total
         let isFinished = false;
 
-        // PROTEKSI SCREENSHOT & KEYBOARD SHORTCUT (Poin 7)
+        // PROTEKSI SCREENSHOT & KEYBOARD SHORTCUT
         document.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen') {
                 triggerSSProtection();
@@ -317,7 +356,7 @@
         });
 
         function triggerSSProtection() {
-            navigator.clipboard.writeText(''); // Clear Clipboard
+            navigator.clipboard.writeText('');
             const shield = document.getElementById('ssShield');
             shield.style.display = 'flex';
             setTimeout(() => { shield.style.display = 'none'; }, 3000);
@@ -327,8 +366,6 @@
             document.getElementById('notifModal').style.display = 'none';
             document.getElementById('materiSection').style.display = 'block';
             mintaFullscreen();
-            
-            // Update Status Ke Server -> sedang mengerjakan (Poin 3)
             updateStatusPengerjaan("sedang mengerjakan");
             loadCatatan();
         }
@@ -480,8 +517,17 @@
         function nextSoal() { if (currentIdx < examData.length - 1) renderQuestion(currentIdx + 1); }
         function prevSoal() { if (currentIdx > 0) renderQuestion(currentIdx - 1); }
 
-        function submitJawaban() {
-            if (!confirm('Yakin ingin mengumpulkan seluruh jawaban?')) return;
+        // Fungsi Membuka Modal Konfirmasi Custom (Menggantikan confirm() bawaan browser)
+        function konfirmasiSubmit() {
+            document.getElementById('customConfirmModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('customConfirmModal').style.display = 'none';
+        }
+
+        function executeSubmitTugas() {
+            closeConfirmModal();
 
             fetch(scriptURL, {
                 method: 'POST',
