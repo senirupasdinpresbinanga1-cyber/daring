@@ -21,13 +21,17 @@
         th { background: #1a1a1a; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
         tr:hover { background: #181818; }
 
-        .btn { background: #fff; color: #000; border: none; padding: 8px 16px; font-weight: 700; font-size: 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+        .btn { background: #fff; color: #000; border: none; padding: 8px 16px; font-weight: 700; font-size: 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn:hover { background: #ccc; }
         .btn-outline { background: transparent; color: #fff; border: 1px solid #fff; }
-        .btn-danger { background: #000; color: #fff; border: 1px solid #fff; }
+        .btn-outline.active { background: #fff; color: #000; }
+        .btn-danger { background: #000; color: #fff; border: 1px solid #fff; padding: 6px 12px; font-size: 11px; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: #111; border: 1px solid #333; padding: 15px; text-align: center; border-radius: 6px; }
         .stat-card h3 { font-size: 28px; margin-top: 5px; }
+        
+        .class-filter-bar { display: flex; gap: 10px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -54,18 +58,25 @@
         </div>
 
         <div class="box">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                 <h3>Rekapitulasi Nilai Siswa</h3>
-                <button class="btn btn-outline" onclick="loadData()">Refresh Data</button>
+                <button class="btn btn-outline" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
+
+            <!-- TOMBOL PILIHAN KELAS 6A & 6B -->
+            <div class="class-filter-bar">
+                <button class="btn btn-outline active" id="btnKelas6A" onclick="filterKelas('Kelas A')">Kelas 6A</button>
+                <button class="btn btn-outline" id="btnKelas6B" onclick="filterKelas('Kelas B')">Kelas 6B</button>
+            </div>
+
             <table>
                 <thead>
                     <tr>
-                        <th>Waktu</th>
-                        <th>NISN</th>
-                        <th>Nama</th>
+                        <th>No</th>
+                        <th>NISN / Absen</th>
+                        <th>Nama Siswa</th>
                         <th>Kelas</th>
-                        <th>Status</th>
+                        <th>Status Pengerjaan</th>
                         <th>Nilai</th>
                         <th>Aksi</th>
                     </tr>
@@ -80,6 +91,10 @@
 
         if (localStorage.getItem('isLoggedIn') !== 'true' || localStorage.getItem('role') !== 'admin') window.location.href = 'index.html';
 
+        let globalSiswa = [];
+        let globalLog = [];
+        let selectedKelas = 'Kelas A';
+
         window.addEventListener('DOMContentLoaded', loadData);
 
         function loadData() {
@@ -91,38 +106,79 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    document.getElementById('totSiswa').innerText = data.siswa.length;
+                    globalSiswa = data.siswa || [];
+                    globalLog = data.log || [];
+
+                    document.getElementById('totSiswa').innerText = globalSiswa.length;
 
                     let selesaiCount = 0;
                     let totNilai = 0;
-                    let html = '';
 
-                    data.log.forEach(l => {
-                        if (l.status.includes('Selesai')) {
+                    globalLog.forEach(l => {
+                        if (l.status && l.status.includes('Selesai')) {
                             selesaiCount++;
                             totNilai += parseFloat(l.nilai_akhir || 0);
                         }
-
-                        html += `<tr>
-                            <td>${new Date(l.waktu).toLocaleString('id-ID')}</td>
-                            <td>${l.nisn}</td>
-                            <td>${l.nama}</td>
-                            <td>${l.kelas}</td>
-                            <td>${l.status}</td>
-                            <td><b>${l.nilai_akhir || 0}</b></td>
-                            <td><button class="btn btn-danger" onclick="resetSiswa('${l.nisn}')">Reset</button></td>
-                        </tr>`;
                     });
 
                     document.getElementById('totSelesai').innerText = selesaiCount;
                     document.getElementById('avgNilai').innerText = selesaiCount > 0 ? (totNilai / selesaiCount).toFixed(2) : 0;
-                    document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">Belum ada data.</td></tr>';
+
+                    renderTable();
                 }
             });
         }
 
+        function filterKelas(kelasStr) {
+            selectedKelas = kelasStr;
+            document.getElementById('btnKelas6A').classList.toggle('active', kelasStr === 'Kelas A');
+            document.getElementById('btnKelas6B').classList.toggle('active', kelasStr === 'Kelas B');
+            renderTable();
+        }
+
+        function renderTable() {
+            // Filter siswa berdasarkan tombol kelas yang dipilih
+            const filteredSiswa = globalSiswa.filter(s => {
+                const k = (s.kelas || "").trim();
+                if (selectedKelas === 'Kelas A') return k.toLowerCase().includes('a');
+                if (selectedKelas === 'Kelas B') return k.toLowerCase().includes('b');
+                return true;
+            });
+
+            let logMap = {};
+            globalLog.forEach(l => {
+                logMap[l.nisn.toString().trim()] = l;
+            });
+
+            let html = '';
+            filteredSiswa.forEach((s, idx) => {
+                const logItem = logMap[s.nisn.toString().trim()];
+                let statusBadge = '<span style="color:#888;">Belum Mulai</span>';
+                let nilaiVal = '-';
+                let actionBtn = '-';
+
+                if (logItem) {
+                    statusBadge = logItem.status;
+                    nilaiVal = `<b>${logItem.nilai_akhir || 0}</b>`;
+                    actionBtn = `<button class="btn btn-danger" onclick="resetSiswa('${s.nisn}')">Reset</button>`;
+                }
+
+                html += `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${s.nisn}</td>
+                    <td>${s.nama}</td>
+                    <td>${s.kelas}</td>
+                    <td>${statusBadge}</td>
+                    <td>${nilaiVal}</td>
+                    <td>${actionBtn}</td>
+                </tr>`;
+            });
+
+            document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">Tidak ada data siswa pada kelas ini.</td></tr>';
+        }
+
         function resetSiswa(nisn) {
-            if (!confirm('Reset pengerjaan siswa ini?')) return;
+            if (!confirm('Reset pengerjaan siswa dengan NISN ' + nisn + '?')) return;
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
