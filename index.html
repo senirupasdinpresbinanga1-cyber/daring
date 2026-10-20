@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Pembelajaran Daring</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: #000; color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
@@ -57,34 +56,34 @@
             btn.innerText = "Memeriksa Data...";
             btn.disabled = true;
 
-            const formData = new FormData();
-            formData.append('nisn', nisn);
-            formData.append('password', password);
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'login', nisn: nisn, password: password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.innerText = "Masuk Pembelajaran";
+                btn.disabled = false;
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    btn.innerText = "Masuk Pembelajaran";
-                    btn.disabled = false;
+                if (data.status === 'success') {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('nisnSiswa', nisn);
+                    localStorage.setItem('namaSiswa', data.nama);
+                    localStorage.setItem('kelasSiswa', data.kelas);
+                    localStorage.setItem('role', data.role);
 
-                    if (data.status === 'success') {
-                        localStorage.setItem('isLoggedIn', 'true');
-                        localStorage.setItem('nisnSiswa', nisn);
-                        localStorage.setItem('namaSiswa', data.nama);
-                        localStorage.setItem('kelasSiswa', data.kelas);
-                        localStorage.setItem('role', data.role);
-
-                        if (data.role === 'admin') window.location.href = 'admin.html';
-                        else window.location.href = 'pembelajaran.html';
-                    } else {
-                        alert("Gagal: " + data.message);
-                    }
-                })
-                .catch(() => {
-                    btn.innerText = "Masuk Pembelajaran";
-                    btn.disabled = false;
-                    alert("Gagal terhubung ke server.");
-                });
+                    if (data.role === 'admin') window.location.href = 'admin.html';
+                    else window.location.href = 'pembelajaran.html';
+                } else {
+                    alert("Gagal: " + data.message);
+                }
+            })
+            .catch(err => {
+                btn.innerText = "Masuk Pembelajaran";
+                btn.disabled = false;
+                alert("Gagal terhubung ke server.");
+            });
         });
     </script>
 </body>
