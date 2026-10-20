@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Pembelajaran Daring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #000; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .header { background: #111; border-bottom: 1px solid #333; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .header h2 { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { font-size: 12px; color: #888; }
+
+        .container { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 30px 20px; display: flex; flex-direction: column; }
+        .box { background: #111; border: 1px solid #333; border-radius: 8px; padding: 25px; margin-bottom: 20px; }
+        
+        .timer-box { font-size: 24px; font-weight: 700; text-align: center; border: 1px dashed #555; padding: 10px; margin-bottom: 20px; letter-spacing: 2px; }
+        .catatan-content { font-size: 15px; line-height: 1.8; color: #ddd; white-space: pre-line; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+
+        .btn-action { background: #fff; color: #000; border: none; padding: 14px 28px; font-weight: 700; font-size: 14px; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: 0.2s; width: 100%; }
+        .btn-action:hover { background: #ccc; }
+        .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
+        .options-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .option-item { background: #000; border: 1px solid #333; padding: 14px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .option-item:hover, .option-item.selected { border-color: #fff; background: #222; }
+        
+        textarea { width: 100%; height: 150px; background: #000; border: 1px solid #333; border-radius: 4px; color: #fff; padding: 12px; font-size: 14px; outline: none; }
+        textarea:focus { border-color: #fff; }
+
+        .nav-btns { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+        .btn-nav { background: #222; color: #fff; border: 1px solid #444; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; }
+        .btn-nav:hover { border-color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h2>Pembelajaran Daring</h2>
+            <p id="displaySiswa">Memuat...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 1. TAHAP MEMBACA CATATAN -->
+        <div id="materiSection" class="box">
+            <h3 style="margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">1. Membaca Catatan Materi</h3>
+            <div class="timer-box" id="timerDisplay">05:00</div>
+            <div class="catatan-content" id="catatanText">Memuat catatan materi dari spreadsheet...</div>
+            <br>
+            <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal</button>
+        </div>
+
+        <!-- 2. TAHAP MENJAWAB SOAL -->
+        <div id="soalSection" class="box" style="display: none;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                <h3 id="qNumber">Soal No. 1</h3>
+                <span id="qCount" style="color: #888; font-size: 13px;">1 / 10</span>
+            </div>
+
+            <div class="q-text" id="qText">Memuat soal...</div>
+            <div id="optionsContainer"></div>
+
+            <div class="nav-btns">
+                <button class="btn-nav" id="btnPrev" onclick="prevSoal()">Sebelumnya</button>
+                <button class="btn-nav" id="btnNext" onclick="nextSoal()">Selanjutnya</button>
+            </div>
+            <br>
+            <button class="btn-action" id="btnSubmit" onclick="submitJawaban()" style="display: none; background: #222; color: #fff; border: 1px solid #fff;">Kumpulkan Tugas</button>
+        </div>
+
+        <!-- 3. TAHAP HASIL -->
+        <div id="hasilSection" class="box" style="display: none; text-align: center;">
+            <h2 style="margin-bottom: 10px;">Pembelajaran Selesai</h2>
+            <p style="color: #aaa; margin-bottom: 20px;">Tugas Anda berhasil dikirim ke server.</p>
+            <div style="font-size: 40px; font-weight: 700; border: 1px solid #fff; padding: 20px; width: 200px; margin: 0 auto 20px auto;" id="scoreDisplay">0</div>
+            <button class="btn-action" onclick="logout()">Keluar Akun</button>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzBhq5dGe0p6MvlxvzwBbhge4Iu5jy9eebNYxHrC_VSf9i4fhdQ21fvlbI-GDO9JamDxA/exec';
+
+        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
+
+        const nisnSiswa = localStorage.getItem('nisnSiswa');
+        const namaSiswa = localStorage.getItem('namaSiswa');
+        const kelasSiswa = localStorage.getItem('kelasSiswa');
+
+        document.getElementById('displaySiswa').innerText = namaSiswa + ' (' + kelasSiswa + ')';
+
+        let examData = [];
+        let userAnswers = {};
+        let currentIdx = 0;
+        let timerSeconds = 300; 
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCatatan();
+        });
+
+        function loadCatatan() {
+            const formData = new FormData();
+            formData.append('action', 'getCatatanMateri');
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('catatanText').innerText = data.catatan;
+                        startTimer();
+                    }
+                });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timerDisplay');
+            const btn = document.getElementById('btnLanjutSoal');
+
+            const interval = setInterval(() => {
+                let m = Math.floor(timerSeconds / 60);
+                let s = timerSeconds % 60;
+                display.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+
+                if (timerSeconds <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    btn.innerText = "Lanjut Mengerjakan Soal";
+                }
+                timerSeconds--;
+            }, 1000);
+        }
+
+        function mulaiMengerjakanSoal() {
+            document.getElementById('materiSection').style.display = 'none';
+            document.getElementById('soalSection').style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('action', 'getSoal');
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success' && data.data.length > 0) {
+                        examData = data.data;
+                        renderQuestion(0);
+                    } else {
+                        alert('Soal belum tersedia.');
+                    }
+                });
+        }
+
+        function renderQuestion(index) {
+            currentIdx = index;
+            const q = examData[index];
+            document.getElementById('qNumber').innerText = 'Soal No. ' + (index + 1);
+            document.getElementById('qCount').innerText = (index + 1) + ' / ' + examData.length;
+            document.getElementById('qText').innerText = q.text;
+
+            const optBox = document.getElementById('optionsContainer');
+            const isEssay = (!q.a && !q.b && !q.c && !q.d);
+
+            if (isEssay) {
+                const val = userAnswers[q.id] || '';
+                optBox.innerHTML = `<textarea placeholder="Ketik jawaban Anda..." oninput="saveAnswer('${q.id}', this.value)">${val}</textarea>`;
+            } else {
+                let html = '<div class="options-list">';
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    const txt = q[opt.toLowerCase()];
+                    if (txt) {
+                        const sel = userAnswers[q.id] === opt ? 'selected' : '';
+                        html += `<div class="option-item ${sel}" onclick="selectOpt('${q.id}', '${opt}')">${opt}. ${txt}</div>`;
+                    }
+                });
+                html += '</div>';
+                optBox.innerHTML = html;
+            }
+
+            document.getElementById('btnPrev').style.display = index === 0 ? 'none' : 'inline-block';
+            document.getElementById('btnNext').style.display = index === examData.length - 1 ? 'none' : 'inline-block';
+            document.getElementById('btnSubmit').style.display = index === examData.length - 1 ? 'block' : 'none';
+        }
+
+        function selectOpt(soalId, val) {
+            userAnswers[soalId] = val;
+            renderQuestion(currentIdx);
+            sendProgress();
+        }
+
+        function saveAnswer(soalId, val) {
+            userAnswers[soalId] = val;
+            sendProgress();
+        }
+
+        function sendProgress() {
+            const formData = new FormData();
+            formData.append('action', 'updateProgress');
+            formData.append('nisn', nisnSiswa);
+            formData.append('nama', namaSiswa);
+            formData.append('kelas', kelasSiswa);
+            formData.append('terjawab', Object.keys(userAnswers).length);
+            formData.append('total', examData.length);
+            formData.append('answers', JSON.stringify(userAnswers));
+            fetch(scriptURL, { method: 'POST', body: formData });
+        }
+
+        function nextSoal() { if (currentIdx < examData.length - 1) renderQuestion(currentIdx + 1); }
+        function prevSoal() { if (currentIdx > 0) renderQuestion(currentIdx - 1); }
+
+        function submitJawaban() {
+            if (!confirm('Yakin ingin mengumpulkan seluruh jawaban?')) return;
+
+            const formData = new FormData();
+            formData.append('action', 'submitTugas');
+            formData.append('nisn', nisnSiswa);
+            formData.append('nama', namaSiswa);
+            formData.append('kelas', kelasSiswa);
+            formData.append('answers', JSON.stringify(userAnswers));
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('soalSection').style.display = 'none';
+                        document.getElementById('hasilSection').style.display = 'block';
+                        document.getElementById('scoreDisplay').innerText = data.nilai;
+                    }
+                });
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
