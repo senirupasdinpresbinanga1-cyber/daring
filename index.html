@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Pembelajaran Daring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #000; color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-card { background: #111; border: 1px solid #333; border-radius: 8px; padding: 40px; width: 100%; max-width: 400px; text-align: center; }
+        .login-card h1 { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; color: #fff; }
+        .login-card p.subtitle { font-size: 13px; color: #888; margin-bottom: 30px; }
+        .input-group { position: relative; margin-bottom: 20px; text-align: left; }
+        .input-group label { font-size: 11px; text-transform: uppercase; color: #aaa; font-weight: 600; display: block; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 4px; color: #fff; font-size: 14px; outline: none; transition: 0.2s; }
+        .input-group input:focus { border-color: #fff; }
+        .btn-login { width: 100%; background: #fff; color: #000; border: none; padding: 12px; font-size: 14px; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: 0.2s; margin-top: 10px; }
+        .btn-login:hover { background: #ccc; }
+        .btn-login:disabled { background: #444; color: #888; cursor: not-allowed; }
+        .footer { margin-top: 25px; font-size: 11px; color: #555; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>Modul Daring</h1>
+        <p class="subtitle">SD INPRES BINANGA 1</p>
+
+        <form id="formLogin">
+            <div class="input-group">
+                <label>Nomor Absen / Username</label>
+                <input type="text" id="username" required placeholder="Masukkan nomor absen" autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" required placeholder="Masukkan password">
+            </div>
+
+            <button type="submit" class="btn-login" id="submitBtn">Masuk Pembelajaran</button>
+        </form>
+
+        <div class="footer">&copy; 2026 Sistem Pembelajaran Mandiri</div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzBhq5dGe0p6MvlxvzwBbhge4Iu5jy9eebNYxHrC_VSf9i4fhdQ21fvlbI-GDO9JamDxA/exec';
+
+        document.getElementById("formLogin").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const btn = document.getElementById("submitBtn");
+            const nisn = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            btn.innerText = "Memeriksa Data...";
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('nisn', nisn);
+            formData.append('password', password);
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerText = "Masuk Pembelajaran";
+                    btn.disabled = false;
+
+                    if (data.status === 'success') {
+                        localStorage.setItem('isLoggedIn', 'true');
+                        localStorage.setItem('nisnSiswa', nisn);
+                        localStorage.setItem('namaSiswa', data.nama);
+                        localStorage.setItem('kelasSiswa', data.kelas);
+                        localStorage.setItem('role', data.role);
+
+                        if (data.role === 'admin') window.location.href = 'admin.html';
+                        else window.location.href = 'pembelajaran.html';
+                    } else {
+                        alert("Gagal: " + data.message);
+                    }
+                })
+                .catch(() => {
+                    btn.innerText = "Masuk Pembelajaran";
+                    btn.disabled = false;
+                    alert("Gagal terhubung ke server.");
+                });
+        });
+    </script>
+</body>
+</html>
