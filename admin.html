@@ -60,7 +60,7 @@
         <div class="box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                 <h3 style="font-weight: 800; letter-spacing: 0.5px;">Rekapitulasi Live Nilai & Status Siswa</h3>
-                <button class="btn btn-outline" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                <button class="btn btn-outline" onclick="loadData()"><i class="fas fa-sync-alt" id="syncIcon"></i> Refresh Data</button>
             </div>
 
             <div class="class-filter-bar">
@@ -98,10 +98,14 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
-            setInterval(loadData, 5000); // Live update otomatis setiap 5 detik
+            // Interval Auto Refresh Dipercepat jadi setiap 3 detik agar Live Update sangat responsif
+            setInterval(loadData, 3000);
         });
 
         function loadData() {
+            const syncIcon = document.getElementById('syncIcon');
+            if (syncIcon) syncIcon.classList.add('fa-spin');
+
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -109,6 +113,7 @@
             })
             .then(res => res.json())
             .then(data => {
+                if (syncIcon) syncIcon.classList.remove('fa-spin');
                 if (data.status === 'success') {
                     globalSiswa = data.siswa || [];
                     globalLog = data.log || [];
@@ -117,7 +122,8 @@
 
                     let selesaiCount = 0;
                     globalLog.forEach(l => {
-                        if (l.status && l.status.toLowerCase().includes('selesai')) {
+                        let statusStr = (l.status || "").toLowerCase();
+                        if (statusStr.includes('selesai')) {
                             selesaiCount++;
                         }
                     });
@@ -125,6 +131,9 @@
                     document.getElementById('totSelesai').innerText = selesaiCount;
                     renderTable();
                 }
+            })
+            .catch(() => {
+                if (syncIcon) syncIcon.classList.remove('fa-spin');
             });
         }
 
