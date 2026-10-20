@@ -30,12 +30,18 @@
         .btn-outline.active { background: linear-gradient(135deg, #ff007a, #7928ca); color: #fff; border-color: transparent; box-shadow: 0 4px 15px rgba(255, 0, 122, 0.4); }
         .btn-danger { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #fff; border: none; padding: 6px 14px; font-size: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; }
         .btn-danger:hover { box-shadow: 0 4px 12px rgba(255, 65, 108, 0.4); }
+        .btn-info { background: linear-gradient(135deg, #7928ca, #ff007a); color: #fff; border: none; padding: 6px 14px; font-size: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-right: 5px; }
         .badge-status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .status-login { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
         .status-mengerjakan { background: rgba(255, 184, 0, 0.15); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
         .status-selesai { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
         .status-belum { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
         .class-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+
+        /* Modal Detail */
+        #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(6, 5, 15, 0.85); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #1e293b; border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 16px; padding: 25px; max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+        .soal-item-detail { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -87,6 +93,17 @@
         </div>
     </div>
 
+    <!-- MODAL DETAIL SISWA -->
+    <div id="detailModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="modalTitle" style="color: #00f2fe; font-size: 16px;">Detail Laporan Analisis Hasil</h3>
+                <button class="btn btn-danger" onclick="closeDetailModal()" style="padding: 4px 10px; font-size: 10px;">Tutup</button>
+            </div>
+            <div id="modalBody">Memuat data...</div>
+        </div>
+    </div>
+
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwk8sODgZTX0rxUMnAyMHdwwxP1tKMQ8rf8kCyjYB2omuimdtJ6BLSZ-2xnn6CTR7k0/exec';
 
@@ -94,11 +111,12 @@
 
         let globalSiswa = [];
         let globalLog = [];
+        let globalSoal = [];
         let selectedKelas = '6A';
 
         window.addEventListener('DOMContentLoaded', () => {
             loadData();
-            setInterval(loadData, 2000);
+            setInterval(loadData, 5000);
         });
 
         function loadData() {
@@ -116,6 +134,7 @@
                 if (data.status === 'success') {
                     globalSiswa = data.siswa || [];
                     globalLog = data.log || [];
+                    globalSoal = data.soal || [];
 
                     document.getElementById('totSiswa').innerText = globalSiswa.length;
 
@@ -176,7 +195,8 @@
                     }
 
                     nilaiVal = `<b style="color:#00f2fe; font-size:15px;">${logItem.nilai_akhir || 0}</b>`;
-                    actionBtn = `<button class="btn btn-danger" onclick="resetSiswa('${s.nisn}')"><i class="fas fa-undo"></i> Reset</button>`;
+                    actionBtn = `<button class="btn btn-info" onclick="bukaDetail('${s.nisn}')"><i class="fas fa-eye"></i> Detail</button>` +
+                                `<button class="btn btn-danger" onclick="resetSiswa('${s.nisn}')"><i class="fas fa-undo"></i> Reset</button>`;
                 }
 
                 html += `<tr>
@@ -191,6 +211,46 @@
             });
 
             document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center; color:#94a3b8;">Tidak ada data siswa pada kelas ini.</td></tr>';
+        }
+
+        function bukaDetail(nisn) {
+            const logItem = globalLog.find(l => l.nisn.toString().trim() === nisn.toString().trim());
+            const siswaItem = globalSiswa.find(s => s.nisn.toString().trim() === nisn.toString().trim());
+            if (!logItem) return alert('Data jawaban tidak ditemukan.');
+
+            document.getElementById('modalTitle').innerText = `Detail Analisis: ${siswaItem ? siswaItem.nama : nisn}`;
+            
+            let userAns = {};
+            try { userAns = JSON.parse(logItem.raw_answers || '{}'); } catch(e){}
+
+            let html = `<p style="margin-bottom: 12px; font-size: 13px;">Nilai Akhir: <b style="color:#00f2fe">${logItem.nilai_akhir || 0}</b></p>`;
+            
+            globalSoal.forEach((soal, idx) => {
+                let kunci = (soal.kunci || "").trim().toUpperCase();
+                let jawabSiswa = (userAns[soal.id] || "-").trim().toUpperCase();
+                let isBenar = jawabSiswa === kunci;
+                let badgeColor = isBenar ? '#00e676' : '#ff416c';
+                let statusText = isBenar ? 'BENAR' : 'SALAH';
+
+                html += `<div class="soal-item-detail">
+                    <p><b>Soal ${idx + 1}:</b> ${soal.text}</p>
+                    <p style="margin-top: 5px;">Jawaban Siswa: <b>${jawabSiswa}</b> | Kunci: <b>${kunci}</b> | <span style="color:${badgeColor}; font-weight:700;">${statusText}</span></p>
+                </div>`;
+            });
+
+            if (logItem.tanda_tangan && logItem.tanda_tangan.startsWith('data:image')) {
+                html += `<div style="margin-top: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px;">Tanda Tangan Digital Siswa:</p>
+                    <img src="${logItem.tanda_tangan}" style="background:#fff; border-radius:8px; max-width:250px; height:80px; object-fit:contain;" />
+                </div>`;
+            }
+
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
         }
 
         function resetSiswa(nisn) {
