@@ -93,7 +93,6 @@
             padding: 25px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.7);
         }
 
-        /* MODAL PETUNJUK DALAM BAHASA DAERAH */
         #notifModal { 
             display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
             background: rgba(6, 5, 15, 0.92); backdrop-filter: blur(12px); z-index: 9999; 
@@ -147,8 +146,8 @@
             <h2 style="margin-bottom: 14px; font-size: 18px; background: linear-gradient(90deg, #ff007a, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Petunjuk Pembelajaran</h2>
             <p style="color: #cbd5e1; font-size: 13.5px; line-height: 1.8; margin-bottom: 24px; text-align: left;">
                 1. Baca si si'da tenne catatan na ee, ampunna u'de di baca, u'de di insang itte jawabanna.<br>
-                2. 5 manne' ki membaca catatan<br>
-                3. 40 menit soal pilihan ganda
+                2. 5 manne' ki ma,baca catatan<br>
+                3. 40 manne' soal pilihan ganda
             </p>
             <button class="btn-action" onclick="mulaiSesiMembaca()"><i class="fas fa-book-open"></i> Mulai Membaca</button>
         </div>
@@ -215,12 +214,11 @@
         let examData = [];
         let userAnswers = {};
         let currentIdx = 0;
-        let timerSeconds = 300; // 5 Menit Baca
+        let timerSeconds = 300; 
         let soalTimerSeconds = 40 * 60; // 40 Menit Pengerjaan Soal
         let isFinished = false;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Begitu login, pastikan status "sudah login" terkirim seketika
             updateStatusPengerjaan("sudah login");
         });
 
@@ -243,8 +241,6 @@
             document.getElementById('notifModal').style.display = 'none';
             document.getElementById('materiSection').style.display = 'block';
             mintaFullscreen();
-            
-            // Ubah status ke "sedang mengerjakan" saat masuk catatan
             updateStatusPengerjaan("sedang mengerjakan");
             loadCatatan();
         }
@@ -322,7 +318,7 @@
             document.getElementById('materiSection').style.display = 'none';
             document.getElementById('soalSection').style.display = 'block';
 
-            startSoalTimer(); // Mulai timer 40 menit
+            startSoalTimer();
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -387,7 +383,7 @@
         function selectOpt(soalId, val) {
             userAnswers[soalId] = val;
             renderQuestion(currentIdx);
-            sendProgress(); // Live update nilai & jawaban secara seketika tanpa refresh
+            sendProgress();
         }
 
         function sendProgress() {
