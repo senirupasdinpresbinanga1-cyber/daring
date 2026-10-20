@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #000; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: #000; color: #fff; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         
         .header { background: #111; border-bottom: 1px solid #333; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
         .header h2 { font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
@@ -17,8 +17,8 @@
         .container { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 30px 20px; display: flex; flex-direction: column; }
         .box { background: #111; border: 1px solid #333; border-radius: 8px; padding: 25px; margin-bottom: 20px; }
         
-        .timer-box { font-size: 24px; font-weight: 700; text-align: center; border: 1px dashed #555; padding: 10px; margin-bottom: 20px; letter-spacing: 2px; }
-        .catatan-content { font-size: 15px; line-height: 1.8; color: #ddd; white-space: pre-line; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+        .timer-box { font-size: 28px; font-weight: 700; text-align: center; border: 1px dashed #555; padding: 12px; margin-bottom: 20px; letter-spacing: 2px; }
+        .catatan-content { font-size: 15px; line-height: 1.8; color: #ddd; white-space: pre-line; max-height: 380px; overflow-y: auto; padding-right: 10px; }
 
         .btn-action { background: #fff; color: #000; border: none; padding: 14px 28px; font-weight: 700; font-size: 14px; text-transform: uppercase; border-radius: 4px; cursor: pointer; transition: 0.2s; width: 100%; }
         .btn-action:hover { background: #ccc; }
@@ -26,18 +26,29 @@
 
         .q-text { font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.6; }
         .options-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .option-item { background: #000; border: 1px solid #333; padding: 14px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .option-item { background: #000; border: 1px solid #333; padding: 14px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .option-item:hover, .option-item.selected { border-color: #fff; background: #222; }
-        
-        textarea { width: 100%; height: 150px; background: #000; border: 1px solid #333; border-radius: 4px; color: #fff; padding: 12px; font-size: 14px; outline: none; }
-        textarea:focus { border-color: #fff; }
 
         .nav-btns { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
         .btn-nav { background: #222; color: #fff; border: 1px solid #444; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; }
         .btn-nav:hover { border-color: #fff; }
+
+        /* WARNING OVERLAY FULLSCREEN */
+        #warningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .warning-card { background: #111; border: 2px solid #fff; border-radius: 8px; padding: 30px; max-width: 450px; width: 100%; }
     </style>
 </head>
 <body>
+
+    <!-- OVERLAY PERINGATAN KELUAR FULLSCREEN -->
+    <div id="warningOverlay">
+        <div class="warning-card">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 15px;"></i>
+            <h2 style="margin-bottom: 10px; font-size: 18px;">PERINGATAN LAYAR PENUH</h2>
+            <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Sistem mendeteksi Anda keluar dari mode Layar Penuh / beralih tab. Harap tetap di halaman ini!</p>
+            <button class="btn-action" onclick="kembaliFullscreen()">Kembali Layar Penuh</button>
+        </div>
+    </div>
 
     <div class="header">
         <div>
@@ -47,7 +58,7 @@
     </div>
 
     <div class="container">
-        <!-- 1. TAHAP MEMBACA CATATAN -->
+        <!-- TAHAP 1: MEMBACA CATATAN -->
         <div id="materiSection" class="box">
             <h3 style="margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">1. Membaca Catatan Materi</h3>
             <div class="timer-box" id="timerDisplay">05:00</div>
@@ -56,11 +67,11 @@
             <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal</button>
         </div>
 
-        <!-- 2. TAHAP MENJAWAB SOAL -->
+        <!-- TAHAP 2: MENJAWAB SOAL (20 PILIHAN GANDA) -->
         <div id="soalSection" class="box" style="display: none;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">
                 <h3 id="qNumber">Soal No. 1</h3>
-                <span id="qCount" style="color: #888; font-size: 13px;">1 / 10</span>
+                <span id="qCount" style="color: #888; font-size: 13px;">1 / 20</span>
             </div>
 
             <div class="q-text" id="qText">Memuat soal...</div>
@@ -74,7 +85,7 @@
             <button class="btn-action" id="btnSubmit" onclick="submitJawaban()" style="display: none; background: #222; color: #fff; border: 1px solid #fff;">Kumpulkan Tugas</button>
         </div>
 
-        <!-- 3. TAHAP HASIL -->
+        <!-- TAHAP 3: HASIL -->
         <div id="hasilSection" class="box" style="display: none; text-align: center;">
             <h2 style="margin-bottom: 10px;">Pembelajaran Selesai</h2>
             <p style="color: #aaa; margin-bottom: 20px;">Tugas Anda berhasil dikirim ke server.</p>
@@ -98,23 +109,54 @@
         let userAnswers = {};
         let currentIdx = 0;
         let timerSeconds = 300; 
+        let isFinished = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadCatatan();
+            mintaFullscreen();
         });
 
-        function loadCatatan() {
-            const formData = new FormData();
-            formData.append('action', 'getCatatanMateri');
+        // FULLSCREEN PROTEKSI LAYAR
+        function mintaFullscreen() {
+            var el = document.documentElement;
+            if (el.requestFullscreen) { el.requestFullscreen().catch(()=>{}); }
+            else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+        }
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        document.getElementById('catatanText').innerText = data.catatan;
-                        startTimer();
-                    }
-                });
+        function kembaliFullscreen() {
+            mintaFullscreen();
+            document.getElementById('warningOverlay').style.display = 'none';
+        }
+
+        document.addEventListener("fullscreenchange", checkScreen);
+        document.addEventListener("webkitfullscreenchange", checkScreen);
+        document.addEventListener("visibilitychange", checkScreen);
+
+        function checkScreen() {
+            if (isFinished) return;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement || document.visibilityState === 'hidden') {
+                document.getElementById('warningOverlay').style.display = 'flex';
+            }
+        }
+
+        function loadCatatan() {
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'getCatatanMateri' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('catatanText').innerText = data.catatan;
+                    startTimer();
+                } else {
+                    document.getElementById('catatanText').innerText = "Gagal memuat catatan materi.";
+                }
+            })
+            .catch(() => {
+                document.getElementById('catatanText').innerText = "Gagal terhubung ke server database.";
+            });
         }
 
         function startTimer() {
@@ -129,7 +171,7 @@
                 if (timerSeconds <= 0) {
                     clearInterval(interval);
                     btn.disabled = false;
-                    btn.innerText = "Lanjut Mengerjakan Soal";
+                    btn.innerText = "Lanjut Menjawab Soal";
                 }
                 timerSeconds--;
             }, 1000);
@@ -139,19 +181,20 @@
             document.getElementById('materiSection').style.display = 'none';
             document.getElementById('soalSection').style.display = 'block';
 
-            const formData = new FormData();
-            formData.append('action', 'getSoal');
-
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success' && data.data.length > 0) {
-                        examData = data.data;
-                        renderQuestion(0);
-                    } else {
-                        alert('Soal belum tersedia.');
-                    }
-                });
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'getSoal' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' && data.data.length > 0) {
+                    examData = data.data;
+                    renderQuestion(0);
+                } else {
+                    alert('Soal belum tersedia di spreadsheet.');
+                }
+            });
         }
 
         function renderQuestion(index) {
@@ -162,23 +205,16 @@
             document.getElementById('qText').innerText = q.text;
 
             const optBox = document.getElementById('optionsContainer');
-            const isEssay = (!q.a && !q.b && !q.c && !q.d);
-
-            if (isEssay) {
-                const val = userAnswers[q.id] || '';
-                optBox.innerHTML = `<textarea placeholder="Ketik jawaban Anda..." oninput="saveAnswer('${q.id}', this.value)">${val}</textarea>`;
-            } else {
-                let html = '<div class="options-list">';
-                ['A', 'B', 'C', 'D'].forEach(opt => {
-                    const txt = q[opt.toLowerCase()];
-                    if (txt) {
-                        const sel = userAnswers[q.id] === opt ? 'selected' : '';
-                        html += `<div class="option-item ${sel}" onclick="selectOpt('${q.id}', '${opt}')">${opt}. ${txt}</div>`;
-                    }
-                });
-                html += '</div>';
-                optBox.innerHTML = html;
-            }
+            let html = '<div class="options-list">';
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                const txt = q[opt.toLowerCase()];
+                if (txt) {
+                    const sel = userAnswers[q.id] === opt ? 'selected' : '';
+                    html += `<div class="option-item ${sel}" onclick="selectOpt('${q.id}', '${opt}')"><b>${opt}.</b> ${txt}</div>`;
+                }
+            });
+            html += '</div>';
+            optBox.innerHTML = html;
 
             document.getElementById('btnPrev').style.display = index === 0 ? 'none' : 'inline-block';
             document.getElementById('btnNext').style.display = index === examData.length - 1 ? 'none' : 'inline-block';
@@ -191,21 +227,20 @@
             sendProgress();
         }
 
-        function saveAnswer(soalId, val) {
-            userAnswers[soalId] = val;
-            sendProgress();
-        }
-
         function sendProgress() {
-            const formData = new FormData();
-            formData.append('action', 'updateProgress');
-            formData.append('nisn', nisnSiswa);
-            formData.append('nama', namaSiswa);
-            formData.append('kelas', kelasSiswa);
-            formData.append('terjawab', Object.keys(userAnswers).length);
-            formData.append('total', examData.length);
-            formData.append('answers', JSON.stringify(userAnswers));
-            fetch(scriptURL, { method: 'POST', body: formData });
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'updateProgress',
+                    nisn: nisnSiswa,
+                    nama: namaSiswa,
+                    kelas: kelasSiswa,
+                    terjawab: Object.keys(userAnswers).length,
+                    total: examData.length,
+                    answers: userAnswers
+                })
+            });
         }
 
         function nextSoal() { if (currentIdx < examData.length - 1) renderQuestion(currentIdx + 1); }
@@ -214,22 +249,26 @@
         function submitJawaban() {
             if (!confirm('Yakin ingin mengumpulkan seluruh jawaban?')) return;
 
-            const formData = new FormData();
-            formData.append('action', 'submitTugas');
-            formData.append('nisn', nisnSiswa);
-            formData.append('nama', namaSiswa);
-            formData.append('kelas', kelasSiswa);
-            formData.append('answers', JSON.stringify(userAnswers));
-
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        document.getElementById('soalSection').style.display = 'none';
-                        document.getElementById('hasilSection').style.display = 'block';
-                        document.getElementById('scoreDisplay').innerText = data.nilai;
-                    }
-                });
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'submitTugas',
+                    nisn: nisnSiswa,
+                    nama: namaSiswa,
+                    kelas: kelasSiswa,
+                    answers: userAnswers
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    isFinished = true;
+                    document.getElementById('soalSection').style.display = 'none';
+                    document.getElementById('hasilSection').style.display = 'block';
+                    document.getElementById('scoreDisplay').innerText = data.nilai;
+                }
+            });
         }
 
         function logout() {
