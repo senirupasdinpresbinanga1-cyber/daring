@@ -65,8 +65,8 @@
 
             <!-- TOMBOL PILIHAN KELAS 6A & 6B -->
             <div class="class-filter-bar">
-                <button class="btn btn-outline active" id="btnKelas6A" onclick="filterKelas('Kelas A')">Kelas 6A</button>
-                <button class="btn btn-outline" id="btnKelas6B" onclick="filterKelas('Kelas B')">Kelas 6B</button>
+                <button class="btn btn-outline active" id="btnKelas6A" onclick="filterKelas('6A')">Kelas 6A</button>
+                <button class="btn btn-outline" id="btnKelas6B" onclick="filterKelas('6B')">Kelas 6B</button>
             </div>
 
             <table>
@@ -93,7 +93,7 @@
 
         let globalSiswa = [];
         let globalLog = [];
-        let selectedKelas = 'Kelas A';
+        let selectedKelas = '6A';
 
         window.addEventListener('DOMContentLoaded', loadData);
 
@@ -131,17 +131,17 @@
 
         function filterKelas(kelasStr) {
             selectedKelas = kelasStr;
-            document.getElementById('btnKelas6A').classList.toggle('active', kelasStr === 'Kelas A');
-            document.getElementById('btnKelas6B').classList.toggle('active', kelasStr === 'Kelas B');
+            document.getElementById('btnKelas6A').classList.toggle('active', kelasStr === '6A');
+            document.getElementById('btnKelas6B').classList.toggle('active', kelasStr === '6B');
             renderTable();
         }
 
         function renderTable() {
-            // Filter siswa berdasarkan tombol kelas yang dipilih
+            // Filter ketat berdasarkan teks kelas di sheet Siswa (mengandung '6a' atau '6b')
             const filteredSiswa = globalSiswa.filter(s => {
-                const k = (s.kelas || "").trim();
-                if (selectedKelas === 'Kelas A') return k.toLowerCase().includes('a');
-                if (selectedKelas === 'Kelas B') return k.toLowerCase().includes('b');
+                const k = (s.kelas || "").toLowerCase().trim();
+                if (selectedKelas === '6A') return k.includes('6a') || k.includes('kelas a');
+                if (selectedKelas === '6B') return k.includes('6b') || k.includes('kelas b');
                 return true;
             });
 
