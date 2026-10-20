@@ -33,11 +33,29 @@
         .btn-nav { background: #222; color: #fff; border: 1px solid #444; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; }
         .btn-nav:hover { border-color: #fff; }
 
+        /* MODAL / NOTIFIKASI AWAL */
+        #notifModal { display: flex; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .notif-card { background: #111; border: 2px solid #fff; border-radius: 8px; padding: 30px; max-width: 480px; width: 100%; text-align: center; }
+
         #warningOverlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         .warning-card { background: #111; border: 2px solid #fff; border-radius: 8px; padding: 30px; max-width: 450px; width: 100%; }
     </style>
 </head>
 <body>
+
+    <!-- MODAL NOTIFIKASI PETUNJUK AWAL -->
+    <div id="notifModal">
+        <div class="notif-card">
+            <h2 style="margin-bottom: 12px; font-size: 20px; text-transform: uppercase;">Petunjuk Pembelajaran</h2>
+            <p style="color: #bbb; font-size: 14px; line-height: 1.6; margin-bottom: 25px; text-align: left;">
+                1. Anda diberikan waktu membaca catatan materi selama <b>5 menit</b>.<br>
+                2. Tombol untuk lanjut menjawab soal akan aktif setelah <b>3 menit</b> apabila Anda sudah selesai membaca lebih awal.<br>
+                3. Terdapat <b>20 soal pilihan ganda</b>.<br>
+                4. Dilarang berpindah tab atau keluar dari mode layar penuh.
+            </p>
+            <button class="btn-action" onclick="mulaiSesiMembaca()">Saya Mengerti, Mulai Membaca</button>
+        </div>
+    </div>
 
     <div id="warningOverlay">
         <div class="warning-card">
@@ -56,14 +74,16 @@
     </div>
 
     <div class="container">
-        <div id="materiSection" class="box">
+        <!-- TAHAP 1: MEMBACA CATATAN -->
+        <div id="materiSection" class="box" style="display: none;">
             <h3 style="margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">1. Membaca Catatan Materi</h3>
             <div class="timer-box" id="timerDisplay">05:00</div>
             <div class="catatan-content" id="catatanText">Memuat catatan materi dari spreadsheet...</div>
             <br>
-            <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal</button>
+            <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal (Aktif setelah 3 menit)</button>
         </div>
 
+        <!-- TAHAP 2: MENJAWAB SOAL -->
         <div id="soalSection" class="box" style="display: none;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px;">
                 <h3 id="qNumber">Soal No. 1</h3>
@@ -81,6 +101,7 @@
             <button class="btn-action" id="btnSubmit" onclick="submitJawaban()" style="display: none; background: #222; color: #fff; border: 1px solid #fff;">Kumpulkan Tugas</button>
         </div>
 
+        <!-- TAHAP 3: HASIL -->
         <div id="hasilSection" class="box" style="display: none; text-align: center;">
             <h2 style="margin-bottom: 10px;">Pembelajaran Selesai</h2>
             <p style="color: #aaa; margin-bottom: 20px;">Tugas Anda berhasil dikirim ke server.</p>
@@ -103,13 +124,15 @@
         let examData = [];
         let userAnswers = {};
         let currentIdx = 0;
-        let timerSeconds = 300; 
+        let timerSeconds = 300; // 5 Menit total
         let isFinished = false;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadCatatan();
+        function mulaiSesiMembaca() {
+            document.getElementById('notifModal').style.display = 'none';
+            document.getElementById('materiSection').style.display = 'block';
             mintaFullscreen();
-        });
+            loadCatatan();
+        }
 
         function mintaFullscreen() {
             var el = document.documentElement;
@@ -162,10 +185,15 @@
                 let s = timerSeconds % 60;
                 display.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
 
-                if (timerSeconds <= 0) {
-                    clearInterval(interval);
+                // Tombol aktif setelah 3 menit (artinya sisa waktu <= 120 detik)
+                if (timerSeconds <= 180) {
                     btn.disabled = false;
                     btn.innerText = "Lanjut Menjawab Soal";
+                }
+
+                if (timerSeconds <= 0) {
+                    clearInterval(interval);
+                    mulaiMengerjakanSoal(); // Otomatis beralih ke soal jika waktu habis
                 }
                 timerSeconds--;
             }, 1000);
