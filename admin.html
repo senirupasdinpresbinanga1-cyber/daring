@@ -83,52 +83,53 @@
         window.addEventListener('DOMContentLoaded', loadData);
 
         function loadData() {
-            const formData = new FormData();
-            formData.append('action', 'getAdminData');
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'getAdminData' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('totSiswa').innerText = data.siswa.length;
 
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        document.getElementById('totSiswa').innerText = data.siswa.length;
+                    let selesaiCount = 0;
+                    let totNilai = 0;
+                    let html = '';
 
-                        let selesaiCount = 0;
-                        let totNilai = 0;
-                        let html = '';
+                    data.log.forEach(l => {
+                        if (l.status.includes('Selesai')) {
+                            selesaiCount++;
+                            totNilai += parseFloat(l.nilai_akhir || 0);
+                        }
 
-                        data.log.forEach(l => {
-                            if (l.status.includes('Selesai')) {
-                                selesaiCount++;
-                                totNilai += parseFloat(l.nilai_akhir || 0);
-                            }
+                        html += `<tr>
+                            <td>${new Date(l.waktu).toLocaleString('id-ID')}</td>
+                            <td>${l.nisn}</td>
+                            <td>${l.nama}</td>
+                            <td>${l.kelas}</td>
+                            <td>${l.status}</td>
+                            <td><b>${l.nilai_akhir || 0}</b></td>
+                            <td><button class="btn btn-danger" onclick="resetSiswa('${l.nisn}')">Reset</button></td>
+                        </tr>`;
+                    });
 
-                            html += `<tr>
-                                <td>${new Date(l.waktu).toLocaleString('id-ID')}</td>
-                                <td>${l.nisn}</td>
-                                <td>${l.nama}</td>
-                                <td>${l.kelas}</td>
-                                <td>${l.status}</td>
-                                <td><b>${l.nilai_akhir || 0}</b></td>
-                                <td><button class="btn btn-danger" onclick="resetSiswa('${l.nisn}')">Reset</button></td>
-                            </tr>`;
-                        });
-
-                        document.getElementById('totSelesai').innerText = selesaiCount;
-                        document.getElementById('avgNilai').innerText = selesaiCount > 0 ? (totNilai / selesaiCount).toFixed(2) : 0;
-                        document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">Belum ada data.</td></tr>';
-                    }
-                });
+                    document.getElementById('totSelesai').innerText = selesaiCount;
+                    document.getElementById('avgNilai').innerText = selesaiCount > 0 ? (totNilai / selesaiCount).toFixed(2) : 0;
+                    document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">Belum ada data.</td></tr>';
+                }
+            });
         }
 
         function resetSiswa(nisn) {
             if (!confirm('Reset pengerjaan siswa ini?')) return;
-            const formData = new FormData();
-            formData.append('action', 'resetSiswa');
-            formData.append('nisn', nisn);
-
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(() => loadData());
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'resetSiswa', nisn: nisn })
+            })
+            .then(res => res.json())
+            .then(() => loadData());
         }
 
         function logout() {
