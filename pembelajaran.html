@@ -594,8 +594,8 @@
             const display = document.getElementById('timerDisplay');
             const btn = document.getElementById('btnLanjutSoal');
 
-            // Tombol terbuka setelah 3 menit membaca berlalu (sisa waktu 7 menit / 420 detik)
-            if (timerSeconds <= 420) {
+            // Tombol terbuka setelah 3 menit membaca berlalu
+            if (timerSeconds <= 120) {
                 btn.disabled = false;
                 btn.innerText = "Lanjut Menjawab Soal";
             }
@@ -607,7 +607,7 @@
 
                 localStorage.setItem(STORAGE_KEY_TIMER_BACA, timerSeconds);
 
-                if (timerSeconds <= 420) {
+                if (timerSeconds <= 120) {
                     btn.disabled = false;
                     btn.innerText = "Lanjut Menjawab Soal";
                 }
