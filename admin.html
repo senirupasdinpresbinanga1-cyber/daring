@@ -33,8 +33,10 @@
         .btn-info { background: linear-gradient(135deg, #7928ca, #ff007a); color: #fff; border: none; padding: 6px 14px; font-size: 11px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-right: 5px; }
         .badge-status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .status-login { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
+        .status-maca { background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.3); }
         .status-mengerjakan { background: rgba(255, 184, 0, 0.15); color: #ffb800; border: 1px solid rgba(255, 184, 0, 0.3); }
-        .status-selesai { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
+        .status-selesai-tugas { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
+        .status-selesai { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
         .status-belum { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
         .class-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
         .filter-group { display: flex; gap: 10px; }
@@ -178,11 +180,15 @@
                 if (logItem) {
                     let st = (logItem.status || "").toLowerCase();
                     if (st === "sudah login") {
-                        statusBadge = `<span class="badge-status status-login">sudah login</span>`;
+                        statusBadge = `<span class="badge-status status-login">Sudah Login</span>`;
+                    } else if (st.includes("sedang membaca")) {
+                        statusBadge = `<span class="badge-status status-maca">${logItem.status}</span>`;
                     } else if (st.includes("sedang mengerjakan") || st.includes("mengerjakan")) {
                         statusBadge = `<span class="badge-status status-mengerjakan">${logItem.status}</span>`;
-                    } else if (st.includes("selesai")) {
-                        statusBadge = `<span class="badge-status status-selesai">${logItem.status}</span>`;
+                    } else if (st === "selesai mengerjakan") {
+                        statusBadge = `<span class="badge-status status-selesai-tugas">Selesai Mengerjakan</span>`;
+                    } else if (st === "selesai") {
+                        statusBadge = `<span class="badge-status status-selesai">Selesai</span>`;
                     } else {
                         statusBadge = `<span class="badge-status status-belum">${logItem.status}</span>`;
                     }
