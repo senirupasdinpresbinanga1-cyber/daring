@@ -196,10 +196,10 @@
         </div>
     </div>
 
-    <!-- MODAL TANDA TANGAN KELUAR AKUN -->
+    <!-- MODAL TANDA TANGAN DIGITAL -->
     <div id="tandaTanganModal">
         <div class="confirm-card" style="max-width: 440px;">
-            <i class="fas fa-id-card" style="font-size: 35px; color: #ff007a; margin-bottom: 10px;"></i>
+            <i class="fas id-card" style="font-size: 35px; color: #ff007a; margin-bottom: 10px;"></i>
             <h3 style="font-size: 16px; margin-bottom: 6px; color: #fff;">Tanda Tangan Digital</h3>
             <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">Silakan buat tanda tangan digital di bawah ini sebagai bukti konfirmasi keluar akun.</p>
             <canvas id="sigCanvas" class="sig-canvas"></canvas>
@@ -258,7 +258,11 @@
             </button>
         </div>
 
+        <!-- HALAMAN / BAGIAN HASIL (NILAI) -->
         <div id="hasilSection" class="box" style="display: none; text-align: center; padding: 35px 20px;">
+            <!-- TOMBOL KELUAR AKUN DIPINDAH KE PALING ATAS SEBELUM "Pembelajaran Selesai" -->
+            <button class="btn-action" onclick="bukaModalTandaTangan()" style="margin-bottom: 25px;"><i class="fas fa-sign-out-alt"></i> Keluar Akun</button>
+
             <h2 style="margin-bottom: 8px; color: #00f2fe;">Pembelajaran Selesai</h2>
             <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 15px;">Tugas Kamu berhasil dikirim.</p>
             <div style="font-size: 45px; font-weight: 800; border: 2px solid #00f2fe; padding: 20px; width: 180px; margin: 0 auto 25px auto; border-radius: 20px; color: #00f2fe; box-shadow: 0 0 25px rgba(0,242,254,0.3);" id="scoreDisplay">0</div>
@@ -288,9 +292,6 @@
                     <tbody id="listNilai6B"></tbody>
                 </table>
             </div>
-
-            <br>
-            <button class="btn-action" onclick="bukaModalTandaTangan()"><i class="fas fa-sign-out-alt"></i> Keluar Akun</button>
         </div>
     </div>
 
@@ -390,7 +391,7 @@
         const STORAGE_KEY_TIMER_SOAL = 'timer_soal_' + nisnSiswa;
         const STORAGE_KEY_FINAL_SCORE = 'final_score_' + nisnSiswa;
 
-        let timerSeconds = 600; // 10 menit
+        let timerSeconds = 600; 
         let soalTimerSeconds = 40 * 60;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -429,7 +430,6 @@
             setupCanvas();
         });
 
-        // Setup Tanda Tangan Canvas
         let canvas, ctx, isDrawing = false;
         function setupCanvas() {
             canvas = document.getElementById('sigCanvas');
@@ -736,14 +736,12 @@
         function executeSubmitTugas() {
             if (isFinished) return;
             
-            // Tandai sudah selesai dan kunci UI secara langsung
             isFinished = true;
             closeConfirmModal();
 
             const btnConfirm = document.getElementById('btnConfirmSubmit');
             if (btnConfirm) btnConfirm.disabled = true;
 
-            // Sembunyikan bagian soal dan buka bagian hasil
             document.getElementById('materiSection').style.display = 'none';
             document.getElementById('soalSection').style.display = 'none';
             document.getElementById('hasilSection').style.display = 'block';
