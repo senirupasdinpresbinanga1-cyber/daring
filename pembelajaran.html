@@ -403,8 +403,8 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Jika server menyatakan statusnya 'sudah login' atau 'belum' (karena di-reset admin), 
-                    // maka bersihkan localStorage lokal siswa agar kembali ke awal (membaca)
+                    // Jika server menyatakan statusnya 'sudah login', 'belum', atau baris log sudah dihapus (di-reset admin),
+                    // maka bersihkan localStorage lokal siswa agar tidak nyangkut di halaman nilai!
                     if (data.examStatus === 'sudah login' || data.examStatus === 'belum' || data.examStatus === '') {
                         localStorage.removeItem(STORAGE_KEY_STAGE);
                         localStorage.removeItem(STORAGE_KEY_TIMER_BACA);
