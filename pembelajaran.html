@@ -62,6 +62,7 @@
         }
         .option-item:hover { border-color: #00f2fe; background: rgba(0, 242, 254, 0.08); }
         .option-item.selected { border-color: #ff007a; background: rgba(255, 0, 122, 0.15); box-shadow: 0 0 15px rgba(255, 0, 122, 0.25); font-weight: 700; }
+        .option-item.disabled { pointer-events: none; opacity: 0.7; }
 
         .nav-btns { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
         .btn-nav { 
@@ -186,11 +187,11 @@
     <div id="customConfirmModal">
         <div class="confirm-card">
             <i class="fas fa-question-circle" style="font-size: 40px; color: #00f2fe; margin-bottom: 12px;"></i>
-            <h3 style="font-size: 16px; margin-bottom: 8px; color: #fff;">Konfirmasi Pengumpulkan</h3>
+            <h3 style="font-size: 16px; margin-bottom: 8px; color: #fff;">Konfirmasi Pengumpulan</h3>
             <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;">Yakin ingin mengumpulkan seluruh jawaban tugas Kamu?</p>
             <div style="display: flex; gap: 10px;">
                 <button class="btn-nav" onclick="closeConfirmModal()" style="background: rgba(255,255,255,0.08);">Batal</button>
-                <button class="btn-action" style="flex: 1; padding: 10px;" onclick="executeSubmitTugas()">Ya, Kumpulkan</button>
+                <button class="btn-action" id="btnConfirmSubmit" style="flex: 1; padding: 10px;" onclick="executeSubmitTugas()">Ya, Kumpulkan</button>
             </div>
         </div>
     </div>
@@ -198,7 +199,7 @@
     <!-- MODAL TANDA TANGAN KELUAR AKUN -->
     <div id="tandaTanganModal">
         <div class="confirm-card" style="max-width: 440px;">
-            <i class="fas id-card" style="font-size: 35px; color: #ff007a; margin-bottom: 10px;"></i>
+            <i class="fas fa-id-card" style="font-size: 35px; color: #ff007a; margin-bottom: 10px;"></i>
             <h3 style="font-size: 16px; margin-bottom: 6px; color: #fff;">Tanda Tangan Digital</h3>
             <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">Silakan buat tanda tangan digital di bawah ini sebagai bukti konfirmasi keluar akun.</p>
             <canvas id="sigCanvas" class="sig-canvas"></canvas>
@@ -389,7 +390,7 @@
         const STORAGE_KEY_TIMER_SOAL = 'timer_soal_' + nisnSiswa;
         const STORAGE_KEY_FINAL_SCORE = 'final_score_' + nisnSiswa;
 
-        let timerSeconds = 600; // Diubah ke 600 detik (10 menit)
+        let timerSeconds = 600; // 10 menit
         let soalTimerSeconds = 40 * 60;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -594,7 +595,6 @@
             const display = document.getElementById('timerDisplay');
             const btn = document.getElementById('btnLanjutSoal');
 
-            // Tombol terbuka setelah 3 menit membaca berlalu
             if (timerSeconds <= 120) {
                 btn.disabled = false;
                 btn.innerText = "Lanjut Menjawab Soal";
@@ -621,6 +621,7 @@
         }
 
         function mulaiMengerjakanSoal(isResumed) {
+            if (isFinished) return;
             document.getElementById('notifModal').style.display = 'none';
             document.getElementById('materiSection').style.display = 'none';
             document.getElementById('soalSection').style.display = 'block';
@@ -684,7 +685,8 @@
                 const txt = q[opt.toLowerCase()];
                 if (txt) {
                     const sel = userAnswers[q.id] === opt ? 'selected' : '';
-                    html += `<div class="option-item ${sel}" onclick="selectOpt('${q.id}', '${opt}')"><b>${opt}.</b> ${txt}</div>`;
+                    const disClass = isFinished ? 'disabled' : '';
+                    html += `<div class="option-item ${sel} ${disClass}" onclick="selectOpt('${q.id}', '${opt}')"><b>${opt}.</b> ${txt}</div>`;
                 }
             });
             html += '</div>';
@@ -692,16 +694,18 @@
 
             document.getElementById('btnPrev').style.visibility = index === 0 ? 'hidden' : 'visible';
             document.getElementById('btnNext').style.display = index === examData.length - 1 ? 'none' : 'inline-block';
-            document.getElementById('btnSubmit').style.display = index === examData.length - 1 ? 'flex' : 'none';
+            document.getElementById('btnSubmit').style.display = (index === examData.length - 1 && !isFinished) ? 'flex' : 'none';
         }
 
         function selectOpt(soalId, val) {
+            if (isFinished) return;
             userAnswers[soalId] = val;
             renderQuestion(currentIdx);
             sendProgress();
         }
 
         function sendProgress() {
+            if (isFinished) return;
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -721,6 +725,7 @@
         function prevSoal() { if (currentIdx > 0) renderQuestion(currentIdx - 1); }
 
         function konfirmasiSubmit() {
+            if (isFinished) return;
             document.getElementById('customConfirmModal').style.display = 'flex';
         }
 
@@ -729,7 +734,19 @@
         }
 
         function executeSubmitTugas() {
+            if (isFinished) return;
+            
+            // Tandai sudah selesai dan kunci UI secara langsung
+            isFinished = true;
             closeConfirmModal();
+
+            const btnConfirm = document.getElementById('btnConfirmSubmit');
+            if (btnConfirm) btnConfirm.disabled = true;
+
+            // Sembunyikan bagian soal dan buka bagian hasil
+            document.getElementById('materiSection').style.display = 'none';
+            document.getElementById('soalSection').style.display = 'none';
+            document.getElementById('hasilSection').style.display = 'block';
 
             fetch(scriptURL, {
                 method: 'POST',
@@ -745,25 +762,21 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    isFinished = true;
-                    
                     localStorage.setItem(STORAGE_KEY_STAGE, 'selesai');
                     localStorage.setItem(STORAGE_KEY_FINAL_SCORE, data.nilai);
 
                     localStorage.removeItem(STORAGE_KEY_TIMER_BACA);
                     localStorage.removeItem(STORAGE_KEY_TIMER_SOAL);
 
-                    document.getElementById('materiSection').style.display = 'none';
-                    document.getElementById('soalSection').style.display = 'none';
-                    
-                    document.getElementById('hasilSection').style.display = 'block';
                     document.getElementById('scoreDisplay').innerText = data.nilai;
-
                     renderNilaiMingguLalu();
 
                     if (document.exitFullscreen) { document.exitFullscreen().catch(()=>{}); }
                     else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
                 }
+            })
+            .catch(() => {
+                alert("Koneksi lambat, namun data tugas Anda sedang diproses server.");
             });
         }
 
