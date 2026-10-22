@@ -395,7 +395,7 @@
         let soalTimerSeconds = 40 * 60;
 
         window.addEventListener('DOMContentLoaded', () => {
-            updateStatusPengerjaan("sudah login");
+            updateStatusPengerjaan("Sudah Login");
 
             const savedStage = localStorage.getItem(STORAGE_KEY_STAGE);
             
@@ -538,7 +538,7 @@
             document.getElementById('notifModal').style.display = 'none';
             document.getElementById('materiSection').style.display = 'block';
             mintaFullscreen();
-            updateStatusPengerjaan("sedang mengerjakan");
+            updateStatusPengerjaan("Sedang Membaca");
             
             localStorage.setItem(STORAGE_KEY_STAGE, 'baca');
             loadCatatan(true);
@@ -628,7 +628,7 @@
 
             if (!isResumed) {
                 mintaFullscreen();
-                updateStatusPengerjaan("sedang mengerjakan");
+                updateStatusPengerjaan("Sedang Mengerjakan");
             }
 
             localStorage.setItem(STORAGE_KEY_STAGE, 'soal');
