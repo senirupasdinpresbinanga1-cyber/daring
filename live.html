@@ -28,14 +28,14 @@
         .btn-outline:hover { background: rgba(255, 255, 255, 0.1); border-color: #00f2fe; }
         .btn-outline.active { background: linear-gradient(135deg, #ff007a, #7928ca); color: #fff; border-color: transparent; box-shadow: 0 4px 15px rgba(255, 0, 122, 0.4); }
         
-        /* WARNA BADGE STATUS BARU */
+        /* WARNA BADGE STATUS */
         .badge-status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .status-belum { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); } /* Abu-abu default */
-        .status-login { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); } /* Biru muda */
-        .status-baca { background: rgba(255, 235, 59, 0.15); color: #ffeb3b; border: 1px solid rgba(255, 235, 59, 0.3); } /* Kuning */
-        .status-mengerjakan { background: rgba(255, 152, 0, 0.15); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); } /* Orange */
-        .status-selesai-tugas { background: rgba(46, 125, 50, 0.15); color: #4caf50; border: 1px solid rgba(46, 125, 50, 0.3); } /* Hijau tua */
-        .status-selesai { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); } /* Hijau */
+        .status-belum { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+        .status-login { background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
+        .status-baca { background: rgba(255, 235, 59, 0.15); color: #ffeb3b; border: 1px solid rgba(255, 235, 59, 0.3); }
+        .status-mengerjakan { background: rgba(255, 152, 0, 0.15); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); }
+        .status-selesai-tugas { background: rgba(46, 125, 50, 0.15); color: #4caf50; border: 1px solid rgba(46, 125, 50, 0.3); }
+        .status-selesai { background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); }
         
         .class-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
         .filter-group { display: flex; gap: 10px; }
@@ -66,16 +66,13 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>NO</th>
-                            <th>ABSEN</th>
                             <th>NAMA SISWA</th>
-                            <th>KELAS</th>
                             <th>STATUS PENGERJAAN</th>
                             <th>NILAI</th>
                         </tr>
                     </thead>
                     <tbody id="logTableBody">
-                        <tr><td colspan="6" style="text-align:center; color:#94a3b8;">Memuat data...</td></tr>
+                        <tr><td colspan="3" style="text-align:center; color:#94a3b8;">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -138,7 +135,7 @@
             });
 
             let html = '';
-            filteredSiswa.forEach((s, idx) => {
+            filteredSiswa.forEach((s) => {
                 const logItem = logMap[s.nisn.toString().trim().toUpperCase()];
                 let statusBadge = '<span class="badge-status status-belum">Belum Mengerjakan</span>';
                 let nilaiVal = '0';
@@ -163,16 +160,13 @@
                 }
 
                 html += `<tr>
-                    <td>${idx + 1}</td>
-                    <td><b>${s.nisn}</b></td>
                     <td>${s.nama}</td>
-                    <td>${s.kelas}</td>
                     <td>${statusBadge}</td>
                     <td>${nilaiVal}</td>
                 </tr>`;
             });
 
-            document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="6" style="text-align:center; color:#94a3b8;">Tidak ada data siswa pada kelas ini.</td></tr>';
+            document.getElementById('logTableBody').innerHTML = html || '<tr><td colspan="3" style="text-align:center; color:#94a3b8;">Tidak ada data siswa pada kelas ini.</td></tr>';
         }
     </script>
 </body>
