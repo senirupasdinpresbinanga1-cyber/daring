@@ -215,8 +215,8 @@
             <h2 style="margin-bottom: 14px; font-size: 18px; background: linear-gradient(90deg, #ff007a, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Petunjuk Pembelajaran</h2>
             <p style="color: #cbd5e1; font-size: 13.5px; line-height: 1.8; margin-bottom: 24px; text-align: left;">
                 1. Baca si si'da tenne catatan na ee, ampunna u'de di baca, u'de di insang itte jawabanna.<br>
-                2. 10 manne' ma,baca catatan<br>
-                3. 40 manne' 20 soal pilihan ganda
+                2. 10 detik waktu membaca<br>
+                3. 40 menit untuk 20 soal pilihan ganda
             </p>
             <button class="btn-action" onclick="mulaiSesiMembaca()"><i class="fas fa-book-open"></i> Mulai Membaca</button>
         </div>
@@ -232,10 +232,10 @@
     <div class="container">
         <div id="materiSection" class="box" style="display: none;">
             <h3 style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; font-size: 15px;">1. Membaca Catatan Materi</h3>
-            <div class="timer-box" id="timerDisplay">10:00</div>
+            <div class="timer-box" id="timerDisplay">00:10</div>
             <div class="catatan-content" id="catatanText">Memuat catatan materi dari server...</div>
             <br>
-            <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal()" disabled>Mulai Menjawab Soal (Aktif setelah 3 menit)</button>
+            <button class="btn-action" id="btnLanjutSoal" onclick="mulaiMengerjakanSoal(false)" disabled>Mulai Menjawab Soal (Aktif setelah 5 menit)</button>
         </div>
 
         <div id="soalSection" class="box" style="display: none;">
@@ -391,7 +391,7 @@
         const STORAGE_KEY_TIMER_SOAL = 'timer_soal_' + nisnSiswa;
         const STORAGE_KEY_FINAL_SCORE = 'final_score_' + nisnSiswa;
 
-        let timerSeconds = 600; 
+        let timerSeconds = 10; // Diubah menjadi 10 detik sesuai permintaan
         let soalTimerSeconds = 40 * 60;
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -595,7 +595,9 @@
             const display = document.getElementById('timerDisplay');
             const btn = document.getElementById('btnLanjutSoal');
 
-            if (timerSeconds <= 120) {
+            // Tombol aktif otomatis setelah 5 menit (300 detik), atau aktif langsung jika waktu membaca di bawah 5 menit
+            const limitAktifTombol = 300; 
+            if (timerSeconds <= limitAktifTombol) {
                 btn.disabled = false;
                 btn.innerText = "Lanjut Menjawab Soal";
             }
@@ -607,11 +609,12 @@
 
                 localStorage.setItem(STORAGE_KEY_TIMER_BACA, timerSeconds);
 
-                if (timerSeconds <= 120) {
+                if (timerSeconds <= limitAktifTombol) {
                     btn.disabled = false;
                     btn.innerText = "Lanjut Menjawab Soal";
                 }
 
+                // Jika waktu baca habis (0), otomatis langsung beralih ke soal tanpa menekan tombol
                 if (timerSeconds <= 0) {
                     clearInterval(interval);
                     mulaiMengerjakanSoal(false);
