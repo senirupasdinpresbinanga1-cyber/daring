@@ -142,7 +142,7 @@
 
                 if (logItem) {
                     let st = (logItem.status || "").toLowerCase();
-                    if (st === "Sudah login") {
+                    if (st === "sudah login") {
                         statusBadge = `<span class="badge-status status-login">sudah login</span>`;
                     } else if (st.includes("sedang mengerjakan") || st.includes("mengerjakan")) {
                         statusBadge = `<span class="badge-status status-mengerjakan">${logItem.status}</span>`;
